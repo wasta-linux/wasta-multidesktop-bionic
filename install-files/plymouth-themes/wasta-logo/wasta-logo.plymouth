@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Wasta Logo
+Description=A theme that features a blank background with a logo.
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/wasta-logo
+ScriptFile=/usr/share/plymouth/themes/wasta-logo/wasta-logo.script

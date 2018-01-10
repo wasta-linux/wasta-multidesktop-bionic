@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (0.1.2) bionic; urgency=medium
+
+  * app-adjustments: adjust applets using jq instead of sed
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 10 Jan 2018 14:14:02 +0300
+
 wasta-multidesktop-bionic (0.1.1) bionic; urgency=medium
 
   * wasta-multidesktop/scripts: adding app-adjustments.sh from 

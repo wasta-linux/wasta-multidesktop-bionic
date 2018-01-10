@@ -41,6 +41,9 @@
 #       wasta-logout systemd script which was difficult to work with).
 #   2017-03-18 rik: this script is no longer triggered by 'at' so user login
 #       won't complete until after this script completes.
+#   2018-01-10 rik: updating for bionic
+#       - app-adjustments.sh now run with 'at' to be triggered at all logins
+#       to ensure no overrides are reverted by package updates.
 #
 # ==============================================================================
 
@@ -67,7 +70,7 @@ else
     touch $DEBUG_FILE
 fi
 
-WASTA_CORE_DIR=/usr/share/wasta-core
+DIR=/usr/share/wasta-multidesktop
 
 if [ $DEBUG ];
 then
@@ -127,10 +130,10 @@ fi
 
 # SYSTEM level fixes:
 # - we want app-adjustments to run every login to ensure that any updated
-#   apps don't revert the settings.
-# - Triggering with at so this login script is not delayed as
+#   apps don't revert the customizations.
+# - Triggering with 'at' so this login script is not delayed as
 #   app-adjustments can run asynchronously.
-echo "$WASTA_CORE_DIR/scripts/app-adjustments.sh $*" | at now || true;
+echo "$DIR/scripts/app-adjustments.sh $*" | at now || true;
 
 # USER level fixes:
 # Ensure Nautilus not showing hidden files (power users may be annoyed)
@@ -363,7 +366,7 @@ then
 #        echo "after nemo draw desk again NAUTILUS draw background: $(su $CURR_USER -c 'dbus-launch gsettings get org.gnome.desktop.background draw-background')" | tee -a $LOGFILE
 #    fi
 
-elif [ "$CURR_SESSION" == "ubuntu" ] || [ "$CURR_SESSION" == "ubuntu-xorg" ] || [ "$CURR_SESSION" == "gnome" ];
+elif [ "$CURR_SESSION" == "ubuntu" ] || [ "$CURR_SESSION" == "ubuntu-xorg" ] || [ "$CURR_SESSION" == "gnome" ] || [ "$CURR_SESSION" == "gnome-flashback-metacity" ] || [ "$CURR_SESSION" == "gnome-flashback-compiz" ];
 then
     # ==========================================================================
     # ACTIVE SESSION: UBUNTU / GNOME (sorry, no XFCE, KDE, or MATE support yet)

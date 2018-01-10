@@ -1,3 +1,11 @@
+wasta-multidesktop-bionic (0.1.1) bionic; urgency=medium
+
+  * wasta-multidesktop/scripts: adding app-adjustments.sh from 
+    wasta-core: want to trigger on every login so placing here.
+  * wasta-login: accounting for gnome-flashback sessions
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 10 Jan 2018 13:48:41 +0300
+
 wasta-multidesktop-bionic (0.1.0) bionic; urgency=low
 
   * initial release

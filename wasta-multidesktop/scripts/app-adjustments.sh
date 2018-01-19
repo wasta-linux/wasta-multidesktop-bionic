@@ -41,6 +41,7 @@
 # 2016-10-07 rik: ubiquity: set to not show if found
 # 2017-03-15 rik: simple-scan set to launch with XDG_CURRENT_DESKTOP=Unity
 # 2017-11-29 rik: initial bionic release
+# 2018-01-19 rik: shortening wasta-remastersys CUSTOMISO label
 #
 # ==============================================================================
 
@@ -214,7 +215,8 @@ then
     fi
 
     # --------------------------------------------------------------------------
-    # Cinnamon Applet Tweaks
+    # Cinnamon Applet Tweaks: core shipping with cinnamon only:
+    #   applets added by wasta-cinnamon-layout are adjusted there
     # --------------------------------------------------------------------------
 
     # applet: calendar@cinnamon.org
@@ -265,6 +267,7 @@ then
     # also enables shutdown, etc.
     sed -i -e "s@this.set_applet_icon_symbolic_name(\"avatar-default\")@this.set_applet_icon_name(\"system-devices-panel\")@" \
         /usr/share/cinnamon/applets/user@cinnamon.org/applet.js
+fi
 
 # ------------------------------------------------------------------------------
 # clamtk-gnome
@@ -683,9 +686,10 @@ then
         WASTA_ARCH="32bit"
     fi
     WASTA_DATE=$(date +%F)
-    
+
+    #shortening CUSTOMISO since if it is too long wasta-remastersys will fail
     sed -i -e "s@LIVECDLABEL=.*@LIVECDLABEL=\"$WASTA_ID $WASTA_VERSION $WASTA_ARCH\"@" \
-           -e "s@CUSTOMISO=.*@CUSTOMISO=\"$WASTA_ID-$WASTA_VERSION-$WASTA_ARCH-$WASTA_DATE.iso\"@" \
+           -e "s@CUSTOMISO=.*@CUSTOMISO=\"WL-$WASTA_VERSION-$WASTA_ARCH.iso\"@" \
         "$WASTA_REMASTERSYS_CONF"
 fi
 

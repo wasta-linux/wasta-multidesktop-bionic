@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (0.2.1) UNRELEASED; urgency=medium
+
+  * app-adjustments: syntax fix on cinnamon panel-launchers adjustment
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 28 Feb 2018 19:38:53 +0300
+
 wasta-multidesktop-bionic (0.2.0) bionic; urgency=medium
 
   * wasta-login: manually syncing AccountsService user background

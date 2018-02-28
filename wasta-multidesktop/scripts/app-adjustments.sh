@@ -69,6 +69,14 @@ echo
 # Setup Diretory for later reference
 DIR=/usr/share/wasta-core
 
+# if 'auto' parameter passed, run non-interactively
+if [ "$1" == "auto" ];
+then
+    AUTO="auto"
+else
+    AUTO=""
+fi
+
 # ------------------------------------------------------------------------------
 # FIRST: Gnome Application Menu Cleanup
 # ------------------------------------------------------------------------------
@@ -255,7 +263,7 @@ then
     # - set default launchers
     # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
     # update ownership (in case run as root)
-    NEW_FILE=$(jq '.["launcherList"].default=["firefox.desktop", "thunderbird.desktop", "nemo.desktop", libreoffice-writer.desktop", "vlc.desktop"]' \
+    NEW_FILE=$(jq '.["launcherList"].default=["firefox.desktop", "thunderbird.desktop", "nemo.desktop", "libreoffice-writer.desktop", "vlc.desktop"]' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE
 

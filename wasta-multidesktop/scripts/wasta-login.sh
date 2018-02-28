@@ -44,6 +44,9 @@
 #   2018-01-10 rik: updating for bionic
 #       - app-adjustments.sh now run with 'at' to be triggered at all logins
 #       to ensure no overrides are reverted by package updates.
+#   2018-02-18 rik: manually syncing AccountsService user background due
+#       to lightdm 1.25/1.26 modifying how the user backgrounds are stored.
+#       https://github.com/linuxmint/slick-greeter/issues/94
 #
 # ==============================================================================
 
@@ -110,18 +113,34 @@ fi
 # ------------------------------------------------------------------------------
 if [ -x /usr/bin/cinnamon ];
 then
-    CINNAMON_BACKGROUND=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.cinnamon.desktop.background picture-uri' || true;)
+    CINNAMON_BG=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.cinnamon.desktop.background picture-uri' || true;)
 fi
-GNOME_BACKGROUND=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri' || true;)
-LIGHTDM_BACKGROUND=$(su "$CURR_USER" -c 'dbus-launch gsettings get x.dm.slick-greeter background' || true;)
+GNOME_BG=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri' || true;)
+
+AS_FILE="/var/lib/AccountsService/users/$CURR_USER"
+
+# Lightdm 1.26 uses a more standardized syntax for storing user backgrounds.
+#   Since individual desktops would need to re-work how to set user backgrounds
+#   for use by lightdm we are doing it manually here to ensure compatiblity
+#   for all desktops
+if ! [ $(grep "BackgroundFile=" $AS_FILE) ];
+then
+    # Error, so BackgroundFile needs to be added to AS_FILE
+    echo  >> $AS_FILE
+    echo "[org.freedesktop.DisplayManager.AccountsService]" >> $AS_FILE
+    echo "BackgroundFile=''" >> $AS_FILE
+fi
+# Retrieve current AccountsService user background
+AS_BG=$(sed -n "s@BackgroundFile=@@p" $AS_FILE)
+
 if [ $DEBUG ];
 then
     if [ -x /usr/bin/cinnamon ];
     then
-        echo "cinnamon bg: $CINNAMON_BACKGROUND" | tee -a $LOGFILE
+        echo "cinnamon bg: $CINNAMON_BG" | tee -a $LOGFILE
     fi
-    echo "gnome bg: $GNOME_BACKGROUND" | tee -a $LOGFILE
-    echo "lightdm bg: $LIGHTDM_BACKGROUND" | tee -a $LOGFILE
+    echo "gnome bg: $GNOME_BG" | tee -a $LOGFILE
+    echo "as bg: $AS_BG" | tee -a $LOGFILE
 fi
 
 # ------------------------------------------------------------------------------
@@ -189,10 +208,14 @@ then
         echo "Previous Session Cinnamon: Sync TO GNOME" | tee -a $LOGFILE
     fi
     # sync Cinnamon background to GNOME background
-    su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri $CINNAMON_BACKGROUND" || true;
-    # sync Cinnmaon background to Slick-Greeter LightDM background
-    LIGHTDM_BACKGROUND=$(echo $CINNAMON_BACKGROUND | sed 's@file://@@')
-    su "$CURR_USER" -c "dbus-launch gsettings set x.dm.slick-greeter background $LIGHTDM_BACKGROUND" || true;
+    su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri $CINNAMON_BG" || true;
+
+    # sync Cinnmaon background to AccountsService background
+    NEW_AS_BG=$(echo $CINNAMON_BG | sed 's@file://@@')
+    if [ "$AS_BG" != "$NEW_AS_BG" ];
+    then
+        sed -i -e "s@\(BackgroundFile=\).*@\1$NEW_AS_BG@" $AS_FILE
+    fi
 else
     if [ -x /usr/bin/cinnamon ];
     then
@@ -202,12 +225,14 @@ else
             echo "Previous Session NOT Cinnamon: Sync TO Cinnamon" | tee -a $LOGFILE
         fi
         # sync GNOME background to Cinnamon background
-        su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri $GNOME_BACKGROUND" || true;
+        su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri $GNOME_BG" || true;
     fi
-    # sync GNOME background to Slick Greeter LightDM background
-    LIGHTDM_BACKGROUND=$(echo $GNOME_BACKGROUND | sed 's@file://@@')
-    # set LIGHTDM background
-    su "$CURR_USER" -c "dbus-launch gsettings set x.dm.slick-greeter background $LIGHTDM_BACKGROUND" || true;
+    # sync GNOME background to AccountsService background
+    NEW_AS_BG=$(echo $GNOME_BG | sed 's@file://@@')
+    if [ "$AS_BG" != "$NEW_AS_BG" ];
+    then
+        sed -i -e "s@\(BackgroundFile=\).*@\1$NEW_AS_BG@" $AS_FILE
+    fi
 fi
 
 # ------------------------------------------------------------------------------
@@ -505,13 +530,13 @@ then
     echo "final settings:" | tee -a $LOGFILE
     if [ -x /usr/bin/cinnamon ];
     then
-        CINNAMON_BACKGROUND_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.cinnamon.desktop.background picture-uri')
-        echo "cinnamon bg NEW: $CINNAMON_BACKGROUND_NEW" | tee -a $LOGFILE
+        CINNAMON_BG_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.cinnamon.desktop.background picture-uri')
+        echo "cinnamon bg NEW: $CINNAMON_BG_NEW" | tee -a $LOGFILE
     fi
-    GNOME_BACKGROUND_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri')
-    LIGHTDM_BACKGROUND_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get x.dm.slick-greeter background')
-    echo "gnome bg NEW: $GNOME_BACKGROUND_NEW" | tee -a $LOGFILE
-    echo "lightdm bg NEW: $LIGHTDM_BACKGROUND_NEW" | tee -a $LOGFILE
+    GNOME_BG_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri')
+    AS_BG_NEW=$(sed -n 's@BackgroundFile=@@p' $AS_FILE)
+    echo "gnome bg NEW: $GNOME_BG_NEW" | tee -a $LOGFILE
+    echo "as bg NEW: $AS_BG_NEW" | tee -a $LOGFILE
     if [ -x /usr/bin/nemo ];
     then
         echo "NEMO show desktop icons: $(su $CURR_USER -c 'dbus-launch gsettings get org.nemo.desktop desktop-layout')" | tee -a $LOGFILE

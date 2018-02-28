@@ -2,8 +2,12 @@ Format: http://dep.debian.net/deps/dep5
 Upstream-Name: wasta-multidesktop-bionic
 Source: https://github.com/wasta-linux/wasta-multidesktop-bionic
 
+Files: wasta-multidesktop/resources/clarity_by_sigi_sagi.jpg
+Copyright: Sigi Sagi
+License: CC-BY-SA-4.0
+
 Files: *
-Copyright: 2017 Rik Shaw <rikshaw76@gmail.com>
+Copyright: 2017-2018 Rik Shaw <rikshaw76@gmail.com>
 License: GPL-3.0+
 
 License: GPL-3.0+

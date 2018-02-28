@@ -10,6 +10,7 @@
 #       glib-compile-schemas /usr/share/glib-2.0/schemas/
 #
 #   2017-11-29 rik: initial bionic settings
+#   2018-02-28 rik: adjusting slick-greeter values
 #
 # ==============================================================================
 
@@ -18,11 +19,11 @@
 [x.dm.slick-greeter]
 background = ''
 background-color = '#30343A'
-background-logo = '/usr/share/icons/hicolor/128x128/apps/wasta-linux.png'
 draw-grid = true
 draw-user-backgrounds = true
 font-name = 'Ubuntu 11'
 icon-theme-name = 'wasta-vertex-ubuntu'
 logo = '/usr/share/wasta-multidesktop/resources/wasta-linux.png'
+other-monitors-logo = '/usr/share/icons/hicolor/128x128/apps/wasta-linux.png'
 play-ready-sound = ''
 theme-name = 'Arc-Darker'

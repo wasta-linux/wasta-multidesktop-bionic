@@ -8,7 +8,7 @@ Homepage: https://github.com/wasta-linux/wasta-multidesktop-bionic
 
 Package: wasta-multidesktop-bionic
 Architecture: all
-Depends: at, jq, slick-greeter, wasta-core-bionic, ${shlibs:Depends}, ${misc:Depends}
+Depends: at, jq, rename, slick-greeter, wasta-core-bionic, ${shlibs:Depends}, ${misc:Depends}
 Description: Wasta-Linux MultiDesktop
  Ensures cross-desktop compatibility between different desktop sessions.
  A lightdm script is executed on login to make necessary adjustments based

@@ -42,6 +42,7 @@
 # 2017-03-15 rik: simple-scan set to launch with XDG_CURRENT_DESKTOP=Unity
 # 2017-11-29 rik: initial bionic release
 # 2018-01-19 rik: shortening wasta-remastersys CUSTOMISO label
+# 2018-03-02 rik: setting wasta-remastersys SLIDESHOW variable
 #
 # ==============================================================================
 
@@ -698,6 +699,7 @@ then
     #shortening CUSTOMISO since if it is too long wasta-remastersys will fail
     sed -i -e "s@LIVECDLABEL=.*@LIVECDLABEL=\"$WASTA_ID $WASTA_VERSION $WASTA_ARCH\"@" \
            -e "s@CUSTOMISO=.*@CUSTOMISO=\"WL-$WASTA_VERSION-$WASTA_ARCH.iso\"@" \
+           -e "s@SLIDESHOW=.*@SLIDESHOW=wasta@" \
         "$WASTA_REMASTERSYS_CONF"
 fi
 

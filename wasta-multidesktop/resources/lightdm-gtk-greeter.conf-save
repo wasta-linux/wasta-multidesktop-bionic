@@ -1,0 +1,8 @@
+[greeter]
+theme-name = Arc-Darker
+icon-theme-name = wasta-vertex-ubuntu
+indicators = ~host;~spacer;~~Wasta-Linux 18.04;~spacer;~session;~language;~a11y;~clock;~power
+clock-format = %b %d, %H:%M
+default-user-image = /usr/share/icons/hicolor/64x64/devices/wasta-linux.png
+position = 5%,start 50%,center
+font-name=Ubuntu 12

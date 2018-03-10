@@ -4,7 +4,7 @@ Description=Text mode theme based on wasta-logo theme
 ModuleName=ubuntu-text
 
 [ubuntu-text]
-title=Wasta-Linux 16.04
+title=Wasta-Linux 18.04
 black=0x30333b
 white=0xffffff
 brown=0xff4012

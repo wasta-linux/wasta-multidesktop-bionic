@@ -1,3 +1,14 @@
+wasta-multidesktop-bionic (0.2.5) bionic; urgency=medium
+
+  * app-adjustments: hiding:
+    - chmsee, xchm
+    - flash-player-properties
+    - htop
+    - uxterm, xterm
+  * wasta-login: cinnamon/gnome-online-accounts-panel processing
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Mon, 26 Mar 2018 10:22:02 +0300
+
 wasta-multidesktop-bionic (0.2.4) xenial; urgency=medium
 
   * plymouth wasta-text theme: updating to "18.04"

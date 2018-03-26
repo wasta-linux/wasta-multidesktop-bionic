@@ -47,6 +47,7 @@
 #   2018-02-18 rik: manually syncing AccountsService user background due
 #       to lightdm 1.25/1.26 modifying how the user backgrounds are stored.
 #       https://github.com/linuxmint/slick-greeter/issues/94
+#   2018-03-26 rik: adding cinnamon/gnome-online-accounts-panel processing
 #
 # ==============================================================================
 
@@ -175,8 +176,6 @@ then
     # Ensure Nemo sidebar set to 'places'
     su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.window-state side-pane-view 'places'" || true;
 
-
-
     # make sure Nemo autostart disabled (we start it ourselves)
     # if [ -e /etc/xdg/autostart/nemo-autostart.desktop ]
     # then
@@ -264,6 +263,12 @@ then
     # --------------------------------------------------------------------------
     # SHOW CINNAMON items
 
+    if [ -e /usr/share/applications/cinnamon-online-accounts-panel.desktop ];
+    then
+        desktop-file-edit --remove-key=NoDisplay \
+            /usr/share/applications/cinnamon-online-accounts-panel.desktop || true;
+    fi
+
     if [ -e /usr/share/applications/cinnamon-settings-startup.desktop ];
     then
         desktop-file-edit --remove-key=NoDisplay \
@@ -312,7 +317,13 @@ then
             /usr/share/applications/alacarte.desktop || true
     fi
 
-    # Gnome Applications
+    if [ -e /usr/share/applications/gnome-online-accounts-panel.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/gnome-online-accounts-panel.desktop || true;
+    fi
+
+    # Gnome Startup Applications
     if [ -e /usr/share/applications/gnome-session-properties.desktop ];
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
@@ -321,7 +332,7 @@ then
 
     if [ -e /usr/share/applications/gnome-tweak-tool.desktop ];
     then
-         desktop-file-edit --set-key=NoDisplay --set-value=true \
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/gnome-tweak-tool.desktop || true;
     fi
 
@@ -425,11 +436,18 @@ then
         fi
     fi
 
+    if [ -e /usr/share/applications/cinnamon-online-accounts-panel.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/cinnamon-online-accounts-panel.desktop || true;
+    fi
+
     if [ -e /usr/share/applications/nemo-compare-preferences.desktop ];
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/nemo-compare-preferences.desktop || true;
     fi
+
     # --------------------------------------------------------------------------
     # Ubuntu/GNOME Settings
     # --------------------------------------------------------------------------
@@ -440,7 +458,13 @@ then
             /usr/share/applications/alacarte.desktop || true;
     fi
 
-    # Gnome Applications
+    if [ -e /usr/share/applications/gnome-online-accounts-panel.desktop ];
+    then
+        desktop-file-edit --remove-key=NoDisplay \
+            /usr/share/applications/gnome-online-accounts-panel.desktop || true;
+    fi
+
+    # Gnome Startup Applications
     if [ -e /usr/share/applications/gnome-session-properties.desktop ];
     then
         desktop-file-edit --remove-key=NoDisplay \

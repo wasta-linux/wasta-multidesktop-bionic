@@ -43,6 +43,11 @@
 # 2017-11-29 rik: initial bionic release
 # 2018-01-19 rik: shortening wasta-remastersys CUSTOMISO label
 # 2018-03-02 rik: setting wasta-remastersys SLIDESHOW variable
+# 2018-03-26 rik: hiding apps from main menu:
+#   - chmsee, xchm
+#   - flash-player-properties
+#   - htop
+#   - uxterm, xterm
 #
 # ==============================================================================
 
@@ -161,6 +166,22 @@ then
     #   ubuntu that I am not fixing (such as using a non-quoted "$" in exec)
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/checkbox-converged.desktop >/dev/null 2>&1 || true;
+fi
+
+# ------------------------------------------------------------------------------
+# chmsee, xchm
+# ------------------------------------------------------------------------------
+# hide if found: added by bloom (?)
+if [ -e /usr/share/applications/chmsee.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/chmsee.desktop
+fi
+
+if [ -e /usr/share/applications/xchm.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/xchm.desktop
 fi
 
 # ------------------------------------------------------------------------------
@@ -321,6 +342,16 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# flash-player-properties (Adobe Flash)
+# ------------------------------------------------------------------------------
+if [ -e /usr/share/applications/flash-player-properties.desktop ];
+then
+    # hide from menu
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/flash-player-properties.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # font-manager
 # ------------------------------------------------------------------------------
 # change to "Utility" ("Accessories"): default is "Graphics"
@@ -414,6 +445,16 @@ if [ -e /usr/share/applications/gnome-search-tool.desktop ];
 then
     desktop-file-edit --set-comment="Find or Locate documents and folders on this computer by name or content" \
         /usr/share/applications/gnome-search-tool.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# htop
+# ------------------------------------------------------------------------------
+# we want command-line only
+if [ -e /usr/share/applications/htop.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/htop.desktop
 fi
 
 # ------------------------------------------------------------------------------
@@ -660,6 +701,22 @@ then
     # hide from main menu
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/ubuntu-amazon-default.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# uxterm, xterm
+# ------------------------------------------------------------------------------
+# pulled in by bloom(??)
+if [ -e /usr/share/applications/debian-uxterm.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/debian-uxterm.desktop
+fi
+
+if [ -e /usr/share/applications/debian-xterm.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/debian-xterm.desktop
 fi
 
 # ------------------------------------------------------------------------------

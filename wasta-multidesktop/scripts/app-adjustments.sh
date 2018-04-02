@@ -48,6 +48,9 @@
 #   - flash-player-properties
 #   - htop
 #   - uxterm, xterm
+# 2018-04-03 rik: hiding openjdk-9-policytool
+#   - hiding org.gnome.font-viewer and org.gnome.FontViewer only if
+#   org.gnome.FontManager is found
 #
 # ==============================================================================
 
@@ -400,22 +403,31 @@ fi
 # ------------------------------------------------------------------------------
 # hide because font-manager better.  User will only need
 #   gnome-font-viewer when double-clicking a font file.  Font-Manager installed
-#   by install-default-apps.sh
-if [ -e /usr/share/applications/org.gnome.font-viewer.desktop ] && [ -e /usr/share/applications/font-manager.desktop ];
+#   by app-installs.sh
+#
+# bionic: there are org.gnome.font-viewer AND org.gnome.FontViewer? hide BOTH
+if [ -e /usr/share/applications/org.gnome.font-viewer.desktop ] && [ -e /usr/share/applications/org.gnome.FontManager.desktop ];
 then
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/org.gnome.font-viewer.desktop
 fi
 
+if [ -e /usr/share/applications/org.gnome.FontViewer.desktop ] && [ -e /usr/share/applications/org.gnome.FontManager.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/org.gnome.FontViewer.desktop
+fi
+
+# ****BIONIC not needed???****
 # rik: 16.04 issue launching gnome-font-viewer: see this report:
 # http://askubuntu.com/questions/804639/font-viewer-not-running-in-ubuntu-16-04
 # "solution" is to comment out DBus line.  This should be fixed in future
 # versions but not sure if it will get backported to xenial or not
-if [ -e /usr/share/applications/org.gnome.font-viewer.desktop ];
-then
-    sed -i -e 's@^\(DBus\)@#\1@' \
-        /usr/share/applications/org.gnome.font-viewer.desktop
-fi
+#if [ -e /usr/share/applications/org.gnome.font-viewer.desktop ];
+#then
+#    sed -i -e 's@^\(DBus\)@#\1@' \
+#        /usr/share/applications/org.gnome.font-viewer.desktop
+#fi
 
 # ------------------------------------------------------------------------------
 # gnome-power-statistics
@@ -430,7 +442,8 @@ fi
 # ------------------------------------------------------------------------------
 # gnome-screenshot
 # ------------------------------------------------------------------------------
-# ****BIONIC NEEDED???? Add to "Accessories" category (by removing from X-GNOME-Utilities)
+# ****BIONIC not needed????****
+# Add to "Accessories" category (by removing from X-GNOME-Utilities)
 #if [ -e /usr/share/applications/org.gnome.Screenshot.desktop ];
 #then
 #    desktop-file-edit ---remove-category=X-GNOME-Utilities \
@@ -580,6 +593,15 @@ then
     #   by the comment fields
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/openjdk-8-policytool.desktop  >/dev/null 2>&1 || true;
+fi
+
+if [ -e /usr/share/applications/openjdk-9-policytool.desktop ];
+then
+    # Hide GUI from start menu
+    # Send output to /dev/null since there are warnings generated
+    #   by the comment fields
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/openjdk-9-policytool.desktop  >/dev/null 2>&1 || true;
 fi
 
 # ------------------------------------------------------------------------------

@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (0.3.1) bionic; urgency=medium
+
+  * app-adjustments.sh: hiding openjdk-9-policytool, font-viewer
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Mon, 02 Apr 2018 14:57:15 +0300
+
 wasta-multidesktop-bionic (0.3.0) bionic; urgency=medium
 
   * wasta-login: if cinnamon then disable blueman

@@ -48,6 +48,8 @@
 #       to lightdm 1.25/1.26 modifying how the user backgrounds are stored.
 #       https://github.com/linuxmint/slick-greeter/issues/94
 #   2018-03-26 rik: adding cinnamon/gnome-online-accounts-panel processing
+#   2018-04-03 rik: if cinnamon then hide blueman-manager and killall
+#       blueman-applet (cinnamon uses blueberry)
 #
 # ==============================================================================
 
@@ -314,7 +316,19 @@ then
     if [ -e /usr/share/applications/alacarte.desktop ];
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
-            /usr/share/applications/alacarte.desktop || true
+            /usr/share/applications/alacarte.desktop || true;
+    fi
+
+    # Blueman-applet may be active: kill (will not error if not found)
+    if [ "$(pgrep blueman-applet)" ];
+    then
+        killall blueman-applet | tee -a $LOGFILE
+    fi
+
+    if [ -e /usr/share/applications/blueman-manager.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/blueman-manager.desktop || true;
     fi
 
     if [ -e /usr/share/applications/gnome-online-accounts-panel.desktop ];
@@ -458,6 +472,12 @@ then
             /usr/share/applications/alacarte.desktop || true;
     fi
 
+    if [ -e /usr/share/applications/blueman-manager.desktop ];
+    then
+        desktop-file-edit -remove-key=NoDisplay \
+            /usr/share/applications/blueman-manager.desktop || true;
+    fi
+
     if [ -e /usr/share/applications/gnome-online-accounts-panel.desktop ];
     then
         desktop-file-edit --remove-key=NoDisplay \
@@ -523,7 +543,6 @@ else
     fi
 
 fi
-
 
 # ------------------------------------------------------------------------------
 # SET PREV Session file for user

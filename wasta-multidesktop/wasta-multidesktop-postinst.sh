@@ -111,6 +111,16 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Fix scrollbars to go "one page at a time" with click
+# ------------------------------------------------------------------------------
+# global gtk-3.0 setting location:
+sed -i -e '$a gtk-primary-button-warps-slider = false' \
+    -i -e '\#gtk-primary-button-warps-slider#d' \
+    /etc/gtk-3.0/settings.ini
+
+# per-theme settings done in app-adjustments since could be reverted
+
+# ------------------------------------------------------------------------------
 # Dconf / Gsettings Default Value adjustments
 # ------------------------------------------------------------------------------
 # Values in /usr/share/glib-2.0/schemas/z_11_wasta-multidesktop.gschema.override

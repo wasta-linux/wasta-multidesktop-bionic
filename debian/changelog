@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.0.1) bionic; urgency=medium
+
+  * postinst: set GTK 3 scrollbars to step 1 page at a time
+  * app-adjustments: set GTK 2 scrollbars to step 1 page at a time
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 23 May 2018 14:45:58 +0300
+
 wasta-multidesktop-bionic (1.0.0) bionic; urgency=medium
 
   * app-adjustments.sh: shortening name for GIMP, bookletimposer

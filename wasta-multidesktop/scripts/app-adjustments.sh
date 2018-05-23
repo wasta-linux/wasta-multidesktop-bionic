@@ -52,6 +52,7 @@
 #   - hiding org.gnome.font-viewer and org.gnome.FontViewer only if
 #   org.gnome.FontManager is found
 # 2018-05-23 rik: shorten GIMP name, capitalize bookletimposer
+#   - correcting Arc scrollbar adjustment
 #
 # ==============================================================================
 
@@ -118,8 +119,9 @@ fi
 # ------------------------------------------------------------------------------
 if [ -e /usr/share/themes/Arc ];
 then
-    # scrollbars: "one page at a time" when clicking:
-    sed -i -e 's@\(gtk-primary-button-warps-slider.*\) true@\1 false@' \
+    # scrollbars: "one page at a time" when clicking: GTK 2
+    # NOTE: GTK 3 setting in postinst since no risk of being overwritten
+    sed -i -e 's@\(gtk-primary-button-warps-slider\).*@\1 = 0@' \
         /usr/share/themes/Arc/gtk-2.0/gtkrc \
         /usr/share/themes/Arc-Dark/gtk-2.0/gtkrc \
         /usr/share/themes/Arc-Darker/gtk-2.0/gtkrc

@@ -51,6 +51,7 @@
 # 2018-04-03 rik: hiding openjdk-9-policytool
 #   - hiding org.gnome.font-viewer and org.gnome.FontViewer only if
 #   org.gnome.FontManager is found
+# 2018-05-23 rik: shorten GIMP name, capitalize bookletimposer
 #
 # ==============================================================================
 
@@ -157,6 +158,16 @@ if [ -e /usr/share/applications/org.gnome.baobab.desktop ];
 then
     desktop-file-edit ---remove-category=X-GNOME-Utilities \
         /usr/share/applications/org.gnome.baobab.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# bookletimposer
+# ------------------------------------------------------------------------------
+if [ -x /usr/bin/bookletimposer ];
+then
+    # Capitalize Name
+    desktop-file-edit --set-name="Booklet Imposer" \
+        /usr/share/applications/bookletimposer.desktop
 fi
 
 # ------------------------------------------------------------------------------
@@ -374,6 +385,10 @@ if [ -x /usr/bin/gimp ];
 then
     # add "Advanced" to comment
     desktop-file-edit --set-comment="Advanced image and photo editor" \
+        /usr/share/applications/gimp.desktop
+
+    # default name is TOO LONG
+    desktop-file-edit --set-name="GIMP Image Editor" \
         /usr/share/applications/gimp.desktop
 fi
 

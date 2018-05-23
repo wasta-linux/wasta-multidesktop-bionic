@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.0.0) bionic; urgency=medium
+
+  * app-adjustments.sh: shortening name for GIMP, bookletimposer
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 23 May 2018 14:16:02 +0300
+
 wasta-multidesktop-bionic (0.3.1) bionic; urgency=medium
 
   * app-adjustments.sh: hiding openjdk-9-policytool, font-viewer

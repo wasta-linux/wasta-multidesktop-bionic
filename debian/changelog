@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.0.2) bionic; urgency=medium
+
+  * app-adjustments: remove wasta-remastersys settings (don't want to
+    reset on every login)
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Fri, 31 Aug 2018 12:40:32 +0300
+
 wasta-multidesktop-bionic (1.0.1) bionic; urgency=medium
 
   * postinst: set GTK 3 scrollbars to step 1 page at a time

@@ -53,6 +53,8 @@
 #   org.gnome.FontManager is found
 # 2018-05-23 rik: shorten GIMP name, capitalize bookletimposer
 #   - correcting Arc scrollbar adjustment
+# 2018-08-31 rik: removing wasta-remastersys.conf adjustments: only want as
+#   part of wasta-core so not reset each login.
 #
 # ==============================================================================
 
@@ -143,11 +145,6 @@ then
 #        /usr/share/themes/Arc-Darker/gtk-3.0/gtk.css \
 #        /usr/share/themes/Arc-Darker/gtk-3.0/gtk-dark.css
 fi
-
-# global gtk-3.0 setting location:
-#sed -i -e '$a gtk-primary-button-warps-slider = false' \
-#    -i -e '\#gtk-primary-button-warps-slider#d' \
-#    /etc/gtk-3.0/settings.ini
 
 #-GtkScrollbar-has-backward-stepper: 1;
 #-GtkScrollbar-has-forward-stepper: 1;
@@ -768,35 +765,6 @@ then
     echo "*** Calling ibus-xkb-adjustments.sh script"
     echo
     bash /usr/share/wasta-ibus/scripts/ibus-xkb-adjustments.sh
-fi
-
-# ------------------------------------------------------------------------------
-# wasta-remastersys
-# ------------------------------------------------------------------------------
-WASTA_REMASTERSYS_CONF=/etc/wasta-remastersys/wasta-remastersys.conf
-if [ -e "$WASTA_REMASTERSYS_CONF" ];
-then
-    # change to wasta-linux splash screen
-    sed -i -e 's@SPLASHPNG=.*@SPLASHPNG="/usr/share/wasta-core/resources/wasta-linux-vga.png"@' \
-        "$WASTA_REMASTERSYS_CONF"
-    
-    # set default CD Label and ISO name
-    WASTA_ID="$(sed -n "\@^ID=@s@^ID=@@p" /etc/wasta-release)"
-    WASTA_VERSION="$(sed -n "\@^VERSION=@s@^VERSION=@@p" /etc/wasta-release)"
-    ARCH=$(uname -m)
-    if [ $ARCH == 'x86_64' ];
-    then
-        WASTA_ARCH="64bit"
-    else
-        WASTA_ARCH="32bit"
-    fi
-    WASTA_DATE=$(date +%F)
-
-    #shortening CUSTOMISO since if it is too long wasta-remastersys will fail
-    sed -i -e "s@LIVECDLABEL=.*@LIVECDLABEL=\"$WASTA_ID $WASTA_VERSION $WASTA_ARCH\"@" \
-           -e "s@CUSTOMISO=.*@CUSTOMISO=\"WL-$WASTA_VERSION-$WASTA_ARCH.iso\"@" \
-           -e "s@SLIDESHOW=.*@SLIDESHOW=wasta@" \
-        "$WASTA_REMASTERSYS_CONF"
 fi
 
 # ------------------------------------------------------------------------------

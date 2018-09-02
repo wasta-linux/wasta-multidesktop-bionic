@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.0.4) bionic; urgency=medium
+
+  * app-adjustments: copy in default zim prefs if not found
+  * wasta-login: copy in default zim prefs if not found
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sun, 02 Sep 2018 19:12:04 +0300
+
 wasta-multidesktop-bionic (1.0.3) bionic; urgency=medium
 
   * change default launchers

@@ -80,7 +80,7 @@ echo "*** Script Entry: app-adjustments.sh"
 echo
 
 # Setup Diretory for later reference
-DIR=/usr/share/wasta-core
+DIR=/usr/share/wasta-multidesktop
 
 # if 'auto' parameter passed, run non-interactively
 if [ "$1" == "auto" ];
@@ -855,11 +855,15 @@ fi
 # ------------------------------------------------------------------------------
 # zim
 # ------------------------------------------------------------------------------
-#if [ -x /usr/bin/zim ];
-#then
+if [ -x /usr/bin/zim ];
+then
     # TODO:if no current .config/zim then copy it from /etc/skel
     # this is needed to enable trayicon plugin by default
-#fi
+    if ! [ -d /etc/skel/.config/zim ];
+    then
+        cp -r $DIR/resources/skel/.config/zim /etc/skel/.config/zim
+    fi
+fi
 
 # ------------------------------------------------------------------------------
 # Default Application Fixes: ??? better command to do this ???

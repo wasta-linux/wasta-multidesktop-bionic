@@ -50,6 +50,7 @@
 #   2018-03-26 rik: adding cinnamon/gnome-online-accounts-panel processing
 #   2018-04-03 rik: if cinnamon then hide blueman-manager and killall
 #       blueman-applet (cinnamon uses blueberry)
+#   2018-09-02 rik: user-level: copy in zim prefs if don't already exist
 #
 # ==============================================================================
 
@@ -194,6 +195,13 @@ then
 #       ****18.04: commenting out to see if necessary - nemo-desktop now manages the desktop
 #       killall nemo-desktop | tee -a $LOGFILE
 #    fi
+fi
+
+# copy in zim prefs if don't already exist (these make trayicon work OOTB)
+if ! [ -e /home/$CURR_USER/.config/zim/preferences.conf ];
+then
+    su "$CURR_USER" -c "cp -r $DIR/resources/skel/.config/zim \
+        /home/$CURR_USER/.config/zim"
 fi
 
 # --------------------------------------------------------------------------

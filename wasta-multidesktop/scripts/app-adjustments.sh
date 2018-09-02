@@ -298,7 +298,7 @@ then
     # - set default launchers
     # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
     # update ownership (in case run as root)
-    NEW_FILE=$(jq '.["launcherList"].default=["firefox.desktop", "thunderbird.desktop", "nemo.desktop", "libreoffice-writer.desktop", "vlc.desktop"]' \
+    NEW_FILE=$(jq '.["launcherList"].default=["firefox.desktop", "nemo.desktop", "libreoffice-writer.desktop", "wasta-backup.desktop", "wasta-resources.desktop"]' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE
 

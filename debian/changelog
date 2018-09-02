@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.0.5) bionic; urgency=medium
+
+  * wasta-login: hide thunar from cinnamon / ubuntu / gnome sessions
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sun, 02 Sep 2018 20:11:18 +0300
+
 wasta-multidesktop-bionic (1.0.4) bionic; urgency=medium
 
   * app-adjustments: copy in default zim prefs if not found

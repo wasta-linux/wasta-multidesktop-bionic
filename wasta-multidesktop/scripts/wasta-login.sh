@@ -51,6 +51,7 @@
 #   2018-04-03 rik: if cinnamon then hide blueman-manager and killall
 #       blueman-applet (cinnamon uses blueberry)
 #   2018-09-02 rik: user-level: copy in zim prefs if don't already exist
+#   2018-09-02 rik: hide thunar from cinnamon or ubuntu/gnome sessions
 #
 # ==============================================================================
 
@@ -400,6 +401,13 @@ then
             /usr/share/applications/software-properties-gnome.desktop || true;
     fi
 
+    # Thunar: hide (only installed for bulk-rename-tool)
+    if [ -e /usr/share/applications/Thunar.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/Thunar.desktop || true;
+    fi
+
     if [ $DEBUG ];
     then
         if [ -x /usr/bin/nemo ];
@@ -468,6 +476,13 @@ then
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/nemo-compare-preferences.desktop || true;
+    fi
+
+    # Thunar: hide (only installed for bulk-rename-tool)
+    if [ -e /usr/share/applications/Thunar.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/Thunar.desktop || true;
     fi
 
     # --------------------------------------------------------------------------
@@ -548,6 +563,13 @@ else
     if [ $DEBUG ];
     then
         echo "desktop session not supported" | tee -a $LOGFILE
+    fi
+
+    # Thunar: show (even though only installed for bulk-rename-tool)
+    if [ -e /usr/share/applications/Thunar.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=false \
+            /usr/share/applications/Thunar.desktop || true;
     fi
 
 fi

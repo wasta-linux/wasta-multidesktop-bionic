@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.0.6) bionic; urgency=medium
+
+  * app-adjustments: prepend 'dbus-launch' to goldendict so that
+    app-indicator icon will show
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Mon, 03 Sep 2018 20:01:34 +0300
+
 wasta-multidesktop-bionic (1.0.5) bionic; urgency=medium
 
   * wasta-login: hide thunar from cinnamon / ubuntu / gnome sessions

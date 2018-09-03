@@ -55,6 +55,9 @@
 #   - correcting Arc scrollbar adjustment
 # 2018-08-31 rik: removing wasta-remastersys.conf adjustments: only want as
 #   part of wasta-core so not reset each login.
+# 2018-09-03 rik: For 18.04 goldendict (and maybe other qt5 apps) need launched
+#   with 'dbus-launch' prepended to the 'Exec=' statement in order for the
+#   appindicator system tray icon to show
 #
 # ==============================================================================
 
@@ -402,6 +405,7 @@ then
         /home/*/.goldendict/config >/dev/null 2>&1
     sed -i -e "s@http://\(.*\).wiktionary.org@https://\1.wiktionary.org@" \
         /home/*/.goldendict/config >/dev/null 2>&1
+
     # for all users, correct hunspell dictionary path
     #   (suppress errors if no user has initialized goldendict)
     sed -i -e 's@\(hunspell dictionariesPath\).*@\1="/usr/share/hunspell"/>@' \
@@ -409,6 +413,12 @@ then
 
     # fix comment
     desktop-file-edit --set-comment="Dictionary / Thesaurus tool" \
+        /usr/share/applications/goldendict.desktop
+
+    # 18.04: goldendict (qt5) plus cinnamon plus app indicator will not show
+    # the tray icon.  Need to add dbus-launch to the launcher and then it will
+    # show.  See: https://github.com/linuxmint/Cinnamon/issues/6143
+    sed -i -e 's@^Exec=goldendict@Exec=dbus-launch goldendict@' \
         /usr/share/applications/goldendict.desktop
 fi
 

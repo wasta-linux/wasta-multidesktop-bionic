@@ -871,6 +871,7 @@ then
     # this is needed to enable trayicon plugin by default
     if ! [ -d /etc/skel/.config/zim ];
     then
+        mkdir -p /etc/skel/.config/zim
         cp -r $DIR/resources/skel/.config/zim /etc/skel/.config/zim
     fi
 fi

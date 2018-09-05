@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.1.1) bionic; urgency=medium
+
+  * wasta-login: hide thunar-settings in cinnamon and ubuntu/gnome
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 05 Sep 2018 15:51:00 +0300
+
 wasta-multidesktop-bionic (1.1.0) bionic; urgency=medium
 
   * app-adjustments: cleanup zip folder creation

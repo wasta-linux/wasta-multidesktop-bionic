@@ -408,6 +408,12 @@ then
             /usr/share/applications/Thunar.desktop || true;
     fi
 
+    if [ -e /usr/share/applications/thunar-settings.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/thunar-settings.desktop || true;
+    fi
+
     if [ $DEBUG ];
     then
         if [ -x /usr/bin/nemo ];
@@ -483,6 +489,12 @@ then
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/Thunar.desktop || true;
+    fi
+
+    if [ -e /usr/share/applications/thunar-settings.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/thunar-settings.desktop || true;
     fi
 
     # --------------------------------------------------------------------------
@@ -570,6 +582,12 @@ else
     then
         desktop-file-edit --set-key=NoDisplay --set-value=false \
             /usr/share/applications/Thunar.desktop || true;
+    fi
+
+    if [ -e /usr/share/applications/thunar-settings.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=false \
+            /usr/share/applications/thunar-settings.desktop || true;
     fi
 
 fi

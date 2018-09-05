@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.1.2) bionic; urgency=medium
+
+  * debian/control: setting Conflicts:gdm3
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 05 Sep 2018 19:30:14 +0300
+
 wasta-multidesktop-bionic (1.1.1) bionic; urgency=medium
 
   * wasta-login: hide thunar-settings in cinnamon and ubuntu/gnome

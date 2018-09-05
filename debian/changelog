@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.1.0) bionic; urgency=medium
+
+  * app-adjustments: cleanup zip folder creation
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 05 Sep 2018 13:47:00 +0300
+
 wasta-multidesktop-bionic (1.0.7) bionic; urgency=medium
 
   * app-adjustments: create /etc/skel/.config/zim if not present

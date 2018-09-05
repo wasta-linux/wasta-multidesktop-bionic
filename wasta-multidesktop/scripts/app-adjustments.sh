@@ -872,7 +872,7 @@ then
     if ! [ -d /etc/skel/.config/zim ];
     then
         mkdir -p /etc/skel/.config/zim
-        cp -r $DIR/resources/skel/.config/zim /etc/skel/.config/zim
+        cp -r $DIR/resources/skel/.config/zim /etc/skel/.config
     fi
 fi
 

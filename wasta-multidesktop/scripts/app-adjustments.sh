@@ -131,6 +131,17 @@ then
         /usr/share/themes/Arc-Dark/gtk-2.0/gtkrc \
         /usr/share/themes/Arc-Darker/gtk-2.0/gtkrc
 
+    # add whiskermenu compatibility (Arc-Darker and Arc-Dark only)
+    # first delete:
+    sed -i -e '\@gtk-whiskermenu-wasta@d' \
+        /usr/share/themes/Arc-Dark/gtk-3.0/gtk.css \
+        /usr/share/themes/Arc-Darker/gtk-3.0/gtk.css
+
+    #add:
+    sed -i -e "$ a @import url(\"$DIR/resources/gtk-whiskermenu-wasta.css\");" \
+        /usr/share/themes/Arc-Dark/gtk-3.0/gtk.css \
+        /usr/share/themes/Arc-Darker/gtk-3.0/gtk.css
+
 # 2017-12 rik: for 18.04 below is making the scrollbar box really fat so disabling
 #    # scrollbars: "add arrow at top":
 #    sed -i -e 's@\(-GtkScrollbar-has-backward-stepper.*\) false@\1 true@' \

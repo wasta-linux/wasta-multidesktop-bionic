@@ -52,8 +52,13 @@
 #       blueman-applet (cinnamon uses blueberry)
 #   2018-09-02 rik: user-level: copy in zim prefs if don't already exist
 #   2018-09-02 rik: hide thunar from cinnamon or ubuntu/gnome sessions
+#   2018-12-16 rik: initial xfce support added for 18.04
 #
 # ==============================================================================
+
+# function: urldecode used to decode gnome picture-uri
+# https://stackoverflow.com/questions/6250698/how-to-decode-url-encoded-string-in-shell
+urldecode(){ : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 
 CURR_USER=$(grep -a "User .* authorized" /var/log/lightdm/lightdm.log | \
     tail -1 | sed 's@.*User \(.*\) authorized@\1@')
@@ -118,9 +123,27 @@ fi
 # ------------------------------------------------------------------------------
 if [ -x /usr/bin/cinnamon ];
 then
-    CINNAMON_BG=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.cinnamon.desktop.background picture-uri' || true;)
+    #cinnamon: "file://" preceeds filename
+    #2018-12-18 rik: will do urldecode but not currently necessary for cinnamon
+    CINNAMON_BG_URL=$(su "$CURR_USER" -c "dbus-launch gsettings get org.cinnamon.desktop.background picture-uri" || true;)
+    CINNAMON_BG=$(urldecode $CINNAMON_BG_URL)
 fi
-GNOME_BG=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri' || true;)
+
+XFCE_DESKTOP="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+if [ -e $XFCE_DESKTOP ];
+then
+    #xfce: NO "file://" preceeding filename
+    XFCE_BG=$(xmlstarlet sel -T -t -m \
+        '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+        -v . -n $XFCE_DESKTOP)
+fi
+
+#gnome: "file://" preceeds filename
+#2018-12-18 rik: urldecode necessary for gnome IF picture-uri set in gnome AND
+#   unicode characters present
+GNOME_BG_URL=$(su "$CURR_USER" -c "dbus-launch gsettings get org.gnome.desktop.background picture-uri" || true;)
+GNOME_BG=$(urldecode $GNOME_BG_URL)
+echo "gnome bg: $GNOME_BG"
 
 AS_FILE="/var/lib/AccountsService/users/$CURR_USER"
 
@@ -144,7 +167,12 @@ then
     then
         echo "cinnamon bg: $CINNAMON_BG" | tee -a $LOGFILE
     fi
-    echo "gnome bg: $GNOME_BG" | tee -a $LOGFILE
+    if [ -e $XFCE_DESKTOP ];
+    then
+        echo "xfce bg: $XFCE_BG" | tee -a $LOGFILE
+    fi
+    echo "gnome bg url encoded: $GNOME_BG_URL" | tee -a $LOGFILE
+    echo "gnome bg url decoded: $GNOME_BG" | tee -a $LOGFILE
     echo "as bg: $AS_BG" | tee -a $LOGFILE
 fi
 
@@ -210,47 +238,112 @@ fi
 # --------------------------------------------------------------------------
 # previously I only triggered if current and prev sessions were different
 # but I will always apply the changes in case it didn't succeed before.
-if [ "$PREV_SESSION" == "cinnamon" ];
-then
-    # apply Cinnamon settings to GNOME
+case "$PREV_SESSION" in
+
+cinnamon)
+    # apply Cinnamon settings to other DEs
     if [ $DEBUG ];
     then
-        echo "Previous Session Cinnamon: Sync TO GNOME" | tee -a $LOGFILE
+        echo "Previous Session Cinnamon: Sync to other DEs" | tee -a $LOGFILE
     fi
+
     # sync Cinnamon background to GNOME background
     su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri $CINNAMON_BG" || true;
 
-    # sync Cinnmaon background to AccountsService background
-    NEW_AS_BG=$(echo $CINNAMON_BG | sed 's@file://@@')
+    if [ -e $XFCE_DESKTOP ];
+    then
+        # sync Cinnamon background to XFCE background
+        NEW_XFCE_BG=$(echo "$CINNAMON_BG" | sed "s@'file://@@" | sed "s@'\$@@")
+        if [ $DEBUG ];
+        then
+            echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
+        fi
+        #xmlstarlet ed --inplace -u \
+        #    '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+        #    -v "$NEW_XFCE_BG" $XFCE_DESKTOP
+        #set ALL properties with name "last-image" to use value of new background
+        sed -i -e 's@\(name="last-image"\).*@\1 type="string" value="'"$NEW_XFCE_BG"'"/>@' \
+            $XFCE_DESKTOP
+    fi
+
+    # sync Cinnamon background to AccountsService background
+    NEW_AS_BG=$(echo "$CINNAMON_BG" | sed "s@file://@@")
     if [ "$AS_BG" != "$NEW_AS_BG" ];
     then
         sed -i -e "s@\(BackgroundFile=\).*@\1$NEW_AS_BG@" $AS_FILE
     fi
-else
+;;
+
+ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
+    # apply GNOME settings to other DEs
+    if [ $DEBUG ];
+    then
+        echo "Previous Session GNOME: Sync to other DEs" | tee -a $LOGFILE
+    fi
+
     if [ -x /usr/bin/cinnamon ];
     then
-        # apply GNOME settings to Cinnamon
-        if [ $DEBUG ];
-        then
-            echo "Previous Session NOT Cinnamon: Sync TO Cinnamon" | tee -a $LOGFILE
-        fi
         # sync GNOME background to Cinnamon background
         su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri $GNOME_BG" || true;
     fi
+
+    if [ -e "$XFCE_DESKTOP" ];
+    then
+        # sync GNOME background to XFCE background
+        NEW_XFCE_BG=$(echo "$GNOME_BG" | sed "s@'file://@@" | sed "s@'\$@@")
+        xmlstarlet ed --inplace -u \
+            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+            -v "$NEW_XFCE_BG" $XFCE_DESKTOP
+    fi
+
     # sync GNOME background to AccountsService background
-    NEW_AS_BG=$(echo $GNOME_BG | sed 's@file://@@')
+    NEW_AS_BG=$(echo "$GNOME_BG" | sed "s@file://@@")
     if [ "$AS_BG" != "$NEW_AS_BG" ];
     then
         sed -i -e "s@\(BackgroundFile=\).*@\1$NEW_AS_BG@" $AS_FILE
     fi
-fi
+;;
+
+xfce)
+    # apply XFCE settings to other DEs
+    if [ $DEBUG ];
+    then
+        echo "Previous Session XFCE: Sync to other DEs" | tee -a $LOGFILE
+    fi
+
+    if [ -x /usr/bin/cinnamon ];
+    then
+        # sync XFCE background to Cinnamon background
+        su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri 'file://$XFCE_BG'" || true;
+    fi
+
+    # sync XFCE background to GNOME background
+    su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri 'file://$XFCE_BG'" || true;
+
+    # sync XFCE background to AccountsService background
+    NEW_AS_BG="'$XFCE_BG'"
+    if [ "$AS_BG" != "$NEW_AS_BG" ];
+    then
+        sed -i -e "s@\(BackgroundFile=\).*@\1$NEW_AS_BG@" $AS_FILE
+    fi
+;;
+
+*)
+    # $PREV_SESSION unknown
+    if [ $DEBUG ];
+    then
+        echo "Unsupported previous session: $PREV_SESSION" | tee -a $LOGFILE
+        echo "Session NOT sync'd to other sessions" | tee -a $LOGFILE
+    fi
+;;
+
+esac
 
 # ------------------------------------------------------------------------------
 # Processing based on session
 # ------------------------------------------------------------------------------
-
-if [ "$CURR_SESSION" == "cinnamon" ];
-then
+case "$CURR_SESSION" in
+cinnamon)
     # ==========================================================================
     # ACTIVE SESSION: CINNAMON
     # ==========================================================================
@@ -286,6 +379,9 @@ then
             /usr/share/applications/cinnamon-settings-startup.desktop || true;
     fi
 
+    # --------------------------------------------------------------------------
+    # NEMO Settings
+    # --------------------------------------------------------------------------
     if [ -x /usr/bin/nemo ];
     then
         desktop-file-edit --remove-key=NoDisplay \
@@ -437,13 +533,12 @@ then
 #        echo "after nemo draw desk again NAUTILUS show desktop icons: $(su $CURR_USER -c 'dbus-launch gsettings get org.gnome.desktop.background show-desktop-icons')" | tee -a $LOGFILE
 #        echo "after nemo draw desk again NAUTILUS draw background: $(su $CURR_USER -c 'dbus-launch gsettings get org.gnome.desktop.background draw-background')" | tee -a $LOGFILE
 #    fi
+;;
 
-elif [ "$CURR_SESSION" == "ubuntu" ] || [ "$CURR_SESSION" == "ubuntu-xorg" ] || [ "$CURR_SESSION" == "gnome" ] || [ "$CURR_SESSION" == "gnome-flashback-metacity" ] || [ "$CURR_SESSION" == "gnome-flashback-compiz" ];
-then
+ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
     # ==========================================================================
-    # ACTIVE SESSION: UBUNTU / GNOME (sorry, no XFCE, KDE, or MATE support yet)
+    # ACTIVE SESSION: UBUNTU / GNOME
     # ==========================================================================
-
     if [ $DEBUG ];
     then
         echo "processing based on UBUNTU / GNOME session" | tee -a $LOGFILE
@@ -570,8 +665,64 @@ then
         desktop-file-edit --remove-key=NoDisplay \
             /usr/share/applications/software-properties-gnome.desktop || true;
     fi
+;;
 
-else
+xfce)
+    # ==========================================================================
+    # ACTIVE SESSION: XFCE
+    # ==========================================================================
+    if [ $DEBUG ];
+    then
+        echo "processing based on XFCE session" | tee -a $LOGFILE
+    fi
+
+    # Nautilus may be active: kill (will not error if not found)
+    if [ "$(pidof nautilus-desktop)" ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "nautilus running (TOP) and needs killed: $(pidof nautilus-desktop)" | tee -a $LOGFILE
+        fi
+        killall nautilus-desktop | tee -a $LOGFILE
+    fi
+
+    if [ -x /usr/bin/nemo ];
+    then
+        desktop-file-edit --remove-key=NoDisplay \
+            /usr/share/applications/nemo.desktop || true;
+
+        # allow nemo to draw the desktop
+        su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.desktop desktop-layout 'true::false'" || true;
+
+        # Ensure Nemo default folder handler
+        sed -i \
+            -e 's@\(inode/directory\)=.*@\1=nemo.desktop@' \
+            -e 's@\(application/x-gnome-saved-search\)=.*@\1=nemo.desktop@' \
+            /etc/gnome/defaults.list \
+            /usr/share/applications/defaults.list || true;
+
+        if ! [ "$(pidof nemo-desktop)" ];
+        then
+            if [ $DEBUG ];
+            then
+                echo "nemo not started: attempting to start" | tee -a $LOGFILE
+            fi
+            # Ensure Nemo Started
+            su "$CURR_USER" -c 'dbus-launch nemo-desktop &' || true;
+        fi
+    fi
+
+    if [ -e /usr/share/applications/nemo-compare-preferences.desktop ];
+    then
+        desktop-file-edit --remove-key=NoDisplay \
+            /usr/share/applications/nemo-compare-preferences.desktop || true;
+    fi
+;;
+
+*)
+    # ==========================================================================
+    # ACTIVE SESSION: not supported yet
+    # ==========================================================================
     if [ $DEBUG ];
     then
         echo "desktop session not supported" | tee -a $LOGFILE
@@ -589,8 +740,9 @@ else
         desktop-file-edit --set-key=NoDisplay --set-value=false \
             /usr/share/applications/thunar-settings.desktop || true;
     fi
+;;
 
-fi
+esac
 
 # ------------------------------------------------------------------------------
 # SET PREV Session file for user
@@ -624,8 +776,15 @@ then
         CINNAMON_BG_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.cinnamon.desktop.background picture-uri')
         echo "cinnamon bg NEW: $CINNAMON_BG_NEW" | tee -a $LOGFILE
     fi
+    if [ -e "$XFCE_DESKTOP" ];
+    then
+        XFCE_BG_NEW=$(xmlstarlet sel -T -t -m \
+            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+            -v . -n $XFCE_DESKTOP)
+        echo "xfce bg NEW: $XFCE_BG_NEW" | tee -a $LOGFILE
+    fi
     GNOME_BG_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri')
-    AS_BG_NEW=$(sed -n 's@BackgroundFile=@@p' $AS_FILE)
+    AS_BG_NEW=$(sed -n "s@BackgroundFile=@@p" "$AS_FILE")
     echo "gnome bg NEW: $GNOME_BG_NEW" | tee -a $LOGFILE
     echo "as bg NEW: $AS_BG_NEW" | tee -a $LOGFILE
     if [ -x /usr/bin/nemo ];

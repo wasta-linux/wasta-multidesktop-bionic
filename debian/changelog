@@ -1,3 +1,11 @@
+wasta-multidesktop-bionic (1.2.0) bionic; urgency=medium
+
+  * initial xfce support
+  * app-adjustments.sh: arc-theme whiskermenu compatibility
+  * wasta-login.sh: xfce compatibility
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Thu, 20 Dec 2018 09:30:08 +0300
+
 wasta-multidesktop-bionic (1.1.2) bionic; urgency=medium
 
   * debian/control: setting Conflicts:gdm3

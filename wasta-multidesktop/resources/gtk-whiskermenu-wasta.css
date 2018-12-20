@@ -1,0 +1,44 @@
+
+/* rik: whiskermenu additions */
+#whiskermenu-window {
+    background-color: #353945;
+    color: #fff;
+}
+
+/* whiskermenu outer border */
+#whiskermenu-window border {
+    border-color: #353945;
+}
+
+/* Make sidebar buttons match */
+#whiskermenu-window button {
+    background-color: #353945;
+    color: #fff;
+}
+
+#whiskermenu-window button:hover {
+    background-color: #5C616C;
+    border-color: #353945;
+    color: #fff;
+}
+
+#whiskermenu-window button:checked {
+    background-color: #5294e2;
+    color: #fff;
+}
+
+/* Make treeview match */
+#whiskermenu-window treeview {
+    background-color: #fff;
+    color: #353945;
+}
+
+#whiskermenu-window treeview:selected {
+    background-color: #5294e2;
+    color: #fff;
+}
+
+/* whiskermenu and other gtk3 panel applets */ 
+.xfce4-panel.panel {
+    font-weight: bold;
+}

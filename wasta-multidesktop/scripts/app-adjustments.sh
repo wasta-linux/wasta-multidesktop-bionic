@@ -58,6 +58,9 @@
 # 2018-09-03 rik: For 18.04 goldendict (and maybe other qt5 apps) need launched
 #   with 'dbus-launch' prepended to the 'Exec=' statement in order for the
 #   appindicator system tray icon to show
+# 2019-01-08 rik: disabling wasta-ibus script for now since there have been some
+#     issues with ibus user settings getting corrupted.
+#   - adding items to XFCE Settings Manager
 #
 # ==============================================================================
 
@@ -179,8 +182,10 @@ fi
 if [ -x /usr/bin/bookletimposer ];
 then
     # Capitalize Name
+    #   sending output to /dev/null because desktop file has errors from
+    #   ubuntu that I am not fixing (such as using a non-quoted "$" in exec)
     desktop-file-edit --set-name="Booklet Imposer" \
-        /usr/share/applications/bookletimposer.desktop
+        /usr/share/applications/bookletimposer.desktop >/dev/null 2>&1 || true;
 fi
 
 # ------------------------------------------------------------------------------
@@ -207,8 +212,10 @@ fi
 
 if [ -e /usr/share/applications/xchm.desktop ];
 then
+    # sending output to /dev/null because desktop file has errors from
+    #   ubuntu that I am not fixing (such as using a non-quoted "$" in exec)
     desktop-file-edit --set-key=NoDisplay --set-value=true \
-        /usr/share/applications/xchm.desktop
+        /usr/share/applications/xchm.desktop >/dev/null 2>&1 || true;
 fi
 
 # ------------------------------------------------------------------------------
@@ -324,6 +331,25 @@ then
     # also enables shutdown, etc.
     sed -i -e "s@this.set_applet_icon_symbolic_name(\"avatar-default\")@this.set_applet_icon_name(\"system-devices-panel\")@" \
         /usr/share/cinnamon/applets/user@cinnamon.org/applet.js
+fi
+
+# ------------------------------------------------------------------------------
+# cinnamon-settings-users
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/cinnamon-settings-users.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/cinnamon-settings-users.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/cinnamon-settings-users.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SystemSettings \
+        /usr/share/applications/cinnamon-settings-users.desktop
+
+    desktop-file-edit --add-only-show-in=XFCE \
+        /usr/share/applications/cinnamon-settings-users.desktop
 fi
 
 # ------------------------------------------------------------------------------
@@ -506,6 +532,22 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# ibus-setup
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/ibus-setup.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/ibus-setup.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/ibus-setup.desktop
+
+    desktop-file-edit --add-category=X-XFCE-HardwareSettings \
+        /usr/share/applications/ibus-setup.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # image-magick
 # ------------------------------------------------------------------------------
 # we want command-line only
@@ -600,6 +642,22 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# nm-connection-editor
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/nm-connection-editor.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/nm-connection-editor.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/nm-connection-editor.desktop
+
+    desktop-file-edit --add-category=X-XFCE-HardwareSettings \
+        /usr/share/applications/nm-connection-editor.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # onboard (on-screen keyboard)
 # ------------------------------------------------------------------------------
 if [ -e /usr/share/applications/onboard.desktop ];
@@ -655,6 +713,9 @@ fi
 # add to XFCE Settings Manager
 if [ -e /usr/share/applications/pavucontrol.desktop ];
 then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/pavucontrol.desktop
+
     desktop-file-edit --add-category=X-XFCE-SettingsDialog \
         /usr/share/applications/pavucontrol.desktop
 
@@ -779,14 +840,16 @@ fi
 # ------------------------------------------------------------------------------
 # wasta-ibus
 # ------------------------------------------------------------------------------
-if [ -e /usr/share/wasta-ibus ];
-then
-    # Ensure xkb keyboards in ibus keyboard list
-    echo
-    echo "*** Calling ibus-xkb-adjustments.sh script"
-    echo
-    bash /usr/share/wasta-ibus/scripts/ibus-xkb-adjustments.sh
-fi
+# 2019-01-08 rik: disabling for now since have been some issues with ibus
+#   user settings getting corrupted.
+#if [ -e /usr/share/wasta-ibus ];
+#then
+#    # Ensure xkb keyboards in ibus keyboard list
+#    echo
+#    echo "*** Calling ibus-xkb-adjustments.sh script"
+#    echo
+#    bash /usr/share/wasta-ibus/scripts/ibus-xkb-adjustments.sh
+#fi
 
 # ------------------------------------------------------------------------------
 # web2py
@@ -864,13 +927,23 @@ then
 fi
 
 # ------------------------------------------------------------------------------
-# xfce4-xscreenshooter
+# xfce4-settings-editor
+# ------------------------------------------------------------------------------
+if [ -e /usr/share/applications/xfce4-settings-editor.desktop ];
+then
+    # Add to "Settings" category
+    desktop-file-edit --add-category=X-XFCE-SystemSettings \
+        /usr/share/applications/xfce4-settings-editor.desktop 
+fi
+
+# ------------------------------------------------------------------------------
+# xfce4-screenshooter
 # ------------------------------------------------------------------------------
 # hide all desktops even from xfce (use gnome instead)
-if [ -e /usr/share/applications/xfce4-xscreenshooter.desktop ];
+if [ -e /usr/share/applications/xfce4-screenshooter.desktop ];
 then
     desktop-file-edit --set-key=NoDisplay --set-value=true \
-        /usr/share/applications/xfce4-xscreenshooter.desktop
+        /usr/share/applications/xfce4-screenshooter.desktop
 fi
 
 # ------------------------------------------------------------------------------

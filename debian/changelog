@@ -1,3 +1,11 @@
+wasta-multidesktop-bionic (1.2.1) bionic; urgency=medium
+
+  * app-adjustments.sh: adding items to XFCE Settings Manager
+    - disabling call to ibus-xkb-adjustments.sh to see if will solve problem
+      of ibus getting corrupted for some users
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Tue, 08 Jan 2019 13:06:56 +0300
+
 wasta-multidesktop-bionic (1.2.0) bionic; urgency=medium
 
   * initial xfce support

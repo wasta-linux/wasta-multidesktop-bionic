@@ -59,7 +59,27 @@
 
 # function: urldecode used to decode gnome picture-uri
 # https://stackoverflow.com/questions/6250698/how-to-decode-url-encoded-string-in-shell
-urldecode(){ : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+#urldecode(){ : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+# update: trying below:
+# https://askubuntu.com/questions/53770/how-can-i-encode-and-decode-percent-encoded-strings-on-the-command-line
+urlencode() {
+    # urlencode <string>
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            *) printf '%%%02X' "'$c"
+        esac
+    done
+}
+
+urldecode() {
+    # urldecode <string>
+    local url_encoded="${1//+/ }"
+    printf '%b' "${url_encoded//%/\\x}"
+}
+
 
 CURR_USER=$(grep -a "User .* authorized" /var/log/lightdm/lightdm.log | \
     tail -1 | sed 's@.*User \(.*\) authorized@\1@')
@@ -124,7 +144,7 @@ fi
 # ------------------------------------------------------------------------------
 if [ -x /usr/bin/cinnamon ];
 then
-    #cinnamon: "file://" preceeds filename
+    #cinnamon: "file://" precedes filename
     #2018-12-18 rik: will do urldecode but not currently necessary for cinnamon
     CINNAMON_BG_URL=$(su "$CURR_USER" -c "dbus-launch gsettings get org.cinnamon.desktop.background picture-uri" || true;)
     CINNAMON_BG=$(urldecode $CINNAMON_BG_URL)
@@ -133,14 +153,14 @@ fi
 XFCE_DESKTOP="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
 if [ -x /usr/bin/xfce4-session ];
 then
-    #xfce: NO "file://" preceeding filename
+    #xfce: NO "file://" preceding filename
 #    XFCE_BG=$(xmlstarlet sel -T -t -m \
 #        '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
 #        -v . -n $XFCE_DESKTOP)
-    XFCE_BG=$(su "$CURR_USER" -c "xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop" || true;)
+    XFCE_BG=$(su "$CURR_USER" -c "xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop")
 fi
 
-#gnome: "file://" preceeds filename
+#gnome: "file://" precedes filename
 #2018-12-18 rik: urldecode necessary for gnome IF picture-uri set in gnome AND
 #   unicode characters present
 GNOME_BG_URL=$(su "$CURR_USER" -c "dbus-launch gsettings get org.gnome.desktop.background picture-uri" || true;)
@@ -259,7 +279,7 @@ cinnamon)
         then
             echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
         fi
-        su "$CURR_USER" -c "xfce4-set-wallpaper $NEW_XFCE_BG" || true;
+        su "$CURR_USER" -c "xfce4-set-wallpaper $NEW_XFCE_BG"
         #xmlstarlet ed --inplace -u \
         #    '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
         #    -v "$NEW_XFCE_BG" $XFCE_DESKTOP
@@ -313,19 +333,22 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
 
 xfce)
     # apply XFCE settings to other DEs
+    XFCE_BG_URL=$(urlencode $XFCE_BG)
+
     if [ $DEBUG ];
     then
         echo "Previous Session XFCE: Sync to other DEs" | tee -a $LOGFILE
+        echo "xfce bg url: $XFCE_BG_URL" | tee -a $LOGFILE
     fi
 
     if [ -x /usr/bin/cinnamon ];
     then
         # sync XFCE background to Cinnamon background
-        su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri 'file://$XFCE_BG'" || true;
+        su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri 'file://$XFCE_BG_URL'" || true;
     fi
 
     # sync XFCE background to GNOME background
-    su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri 'file://$XFCE_BG'" || true;
+    su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri 'file://$XFCE_BG_URL'" || true;
 
     # sync XFCE background to AccountsService background
     NEW_AS_BG="'$XFCE_BG'"

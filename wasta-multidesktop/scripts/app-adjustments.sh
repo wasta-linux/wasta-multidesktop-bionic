@@ -907,11 +907,11 @@ fi
 # xfce4-appfinder
 # ------------------------------------------------------------------------------
 # hide from all desktops even from xfce (only used via shortcut)
-# if [ -e /usr/share/applications/xfce4-appfinder.desktop ];
-# then
-#     desktop-file-edit --set-key=NoDisplay --set-value=true \
-#         /usr/share/applications/xfce4-appfinder.desktop
-# fi
+if [ -e /usr/share/applications/xfce4-appfinder.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/xfce4-appfinder.desktop
+fi
 
 # ------------------------------------------------------------------------------
 # xfce4-power-manager-settings

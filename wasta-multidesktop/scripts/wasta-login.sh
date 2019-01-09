@@ -53,7 +53,8 @@
 #   2018-09-02 rik: user-level: copy in zim prefs if don't already exist
 #   2018-09-02 rik: hide thunar from cinnamon or ubuntu/gnome sessions
 #   2018-12-16 rik: initial xfce support added for 18.04
-#   2019-01-10 rik: correcting get and set xfce background
+#   2019-01-10 rik: reworking get and set of xfce background and killall on
+#       dconf-service at the end to ensure cinnamon/gnome settings applied
 #
 # ==============================================================================
 

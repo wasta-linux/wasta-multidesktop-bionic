@@ -1,7 +1,13 @@
-wasta-multidesktop-bionic (1.2.3) UNRELEASED; urgency=medium
+wasta-multidesktop-bionic (1.2.4) bionic; urgency=medium
+
+  * wasta-login.sh: killall user-level dbus-daemon at the end
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 09 Jan 2019 20:15:46 +0300
+
+wasta-multidesktop-bionic (1.2.3) bionic; urgency=medium
 
   * wasta-login.sh: correcting get and set xfce background
-    - killall dconf processes started at the end
+    - killall dconf processes at the end
 
  -- Rik Shaw <rikshaw76@gmail.com>  Wed, 09 Jan 2019 09:40:36 +0300
 

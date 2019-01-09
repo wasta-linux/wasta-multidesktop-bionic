@@ -59,27 +59,31 @@
 
 # function: urldecode used to decode gnome picture-uri
 # https://stackoverflow.com/questions/6250698/how-to-decode-url-encoded-string-in-shell
-#urldecode(){ : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+urldecode(){ : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+
 # update: trying below:
 # https://askubuntu.com/questions/53770/how-can-i-encode-and-decode-percent-encoded-strings-on-the-command-line
-urlencode() {
-    # urlencode <string>
-    local length="${#1}"
-    for (( i = 0; i < length; i++ )); do
-        local c="${1:i:1}"
-        case $c in
-            [a-zA-Z0-9.~_-:/]) printf "$c" ;;
-            *) printf '%%%02X' "'$c"
-        esac
-    done
-}
+#urlencode() {
+#    # urlencode <string>
+#    local length="${#1}"
+#    for (( i = 0; i < length; i++ )); do
+#        local c="${1:i:1}"
+#        case $c in
+#            [a-zA-Z0-9.~_-:/]) printf "$c" ;;
+#            *) printf '%%%02X' "'$c"
+#        esac
+#    done
+#}
+#
+#urldecode() {
+#    # urldecode <string>
+#    local url_encoded="${1//+/ }"
+#    printf '%b' "${url_encoded//%/\\x}"
+#}
 
-urldecode() {
-    # urldecode <string>
-    local url_encoded="${1//+/ }"
-    printf '%b' "${url_encoded//%/\\x}"
-}
-
+# ------------------------------------------------------------------------------
+# Initial Setup
+# ------------------------------------------------------------------------------
 
 CURR_USER=$(grep -a "User .* authorized" /var/log/lightdm/lightdm.log | \
     tail -1 | sed 's@.*User \(.*\) authorized@\1@')
@@ -139,6 +143,17 @@ then
     exit 0
 fi
 
+# xfconfd: started but shouldn't be running (likely residual from logged out
+#   xfce session)
+if [ "$(pidof xfconfd)" ];
+then
+    if [ $DEBUG ];
+    then
+        echo "xfconfd is running and is being stopped: $(pidof xfconfd)" | tee -a $LOGFILE
+    fi
+    killall xfconfd | tee -a $LOGFILE
+fi
+
 # ------------------------------------------------------------------------------
 # Store current backgrounds
 # ------------------------------------------------------------------------------
@@ -150,15 +165,43 @@ then
     CINNAMON_BG=$(urldecode $CINNAMON_BG_URL)
 fi
 
-XFCE_DESKTOP="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
 if [ -x /usr/bin/xfce4-session ];
 then
+    XFCE_DEFAULT_SETTINGS="/etc/xdg/xdg-xfce/xfce4/"
+    XFCE_SETTINGS="/home/$CURR_USER/.config/xfce4/"
+    if ! [ -e $XFCE_DESKTOP ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "Creating xfce4 settings for user" | tee -a $LOGFILE
+        fi
+        mkdir -p $XFCE_SETTINGS
+        cp -r $XFCE_DEFAULT_SETTINGS $XFCE_SETTINGS
+    fi
+
+    XFCE_DEFAULT_DESKTOP="/etc/xdg/xdg-xfce/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+    XFCE_DESKTOP="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
+    if ! [ -e $XFCE_DESKTOP ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "Creating xfce4-desktop.xml for user" | tee -a $LOGFILE
+        fi
+        mkdir -p $XFCE_SETTINGS/xfconf/xfce-perchannel-xml/
+        cp $XFCE_DEFAULT_DESKTOP $XFCE_DESKTOP
+    fi
+
     #xfce: NO "file://" preceding filename
-#    XFCE_BG=$(xmlstarlet sel -T -t -m \
-#        '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
-#        -v . -n $XFCE_DESKTOP)
-    XFCE_BG=$(su "$CURR_USER" -c "dbus-launch xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop")
+    XFCE_BG=$(xmlstarlet sel -T -t -m \
+        '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+        -v . -n $XFCE_DESKTOP)
+    # not wanting to use xfconf-query because it starts xfconfd which then makes
+    # it difficult to change user settings.
+    #XFCE_BG=$(su "$CURR_USER" -c "dbus-launch xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop")
 fi
+
+# Ensure all .config files owned by user
+chown -R $CURR_USER:$CURR_USER /home/$CURR_USER/.config/
 
 #gnome: "file://" precedes filename
 #2018-12-18 rik: urldecode necessary for gnome IF picture-uri set in gnome AND
@@ -273,19 +316,22 @@ cinnamon)
 
     if [ -x /usr/bin/xfce4-session ];
     then
+        # first make sure xfconfd not running or else change won't load
+        #killall xfconfd
+
         # sync Cinnamon background to XFCE background
         NEW_XFCE_BG=$(echo "$CINNAMON_BG" | sed "s@'file://@@" | sed "s@'\$@@")
         if [ $DEBUG ];
         then
             echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
         fi
-        su "$CURR_USER" -c "dbus-launch xfce4-set-wallpaper $NEW_XFCE_BG" || true;
-        #xmlstarlet ed --inplace -u \
-        #    '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
-        #    -v "$NEW_XFCE_BG" $XFCE_DESKTOP
+        #su "$CURR_USER" -c "dbus-launch xfce4-set-wallpaper $NEW_XFCE_BG" || true;
+        xmlstarlet ed --inplace -u \
+            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+            -v "$NEW_XFCE_BG" $XFCE_DESKTOP
         #set ALL properties with name "last-image" to use value of new background
-        #sed -i -e 's@\(name="last-image"\).*@\1 type="string" value="'"$NEW_XFCE_BG"'"/>@' \
-        #    $XFCE_DESKTOP
+        sed -i -e 's@\(name="last-image"\).*@\1 type="string" value="'"$NEW_XFCE_BG"'"/>@' \
+            $XFCE_DESKTOP
     fi
 
     # sync Cinnamon background to AccountsService background
@@ -311,16 +357,22 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
 
     if [ -x /usr/bin/xfce4-session ];
     then
+        # first make sure xfconfd not running or else change won't load
+        #killall xfconfd
+
         # sync GNOME background to XFCE background
         NEW_XFCE_BG=$(echo "$GNOME_BG" | sed "s@'file://@@" | sed "s@'\$@@")
         if [ $DEBUG ];
         then
             echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
         fi
-        su "$CURR_USER" -c "dbus-launch xfce4-set-wallpaper $NEW_XFCE_BG" || true;
-#        xmlstarlet ed --inplace -u \
-#            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
-#            -v "$NEW_XFCE_BG" $XFCE_DESKTOP
+        #su "$CURR_USER" -c "dbus-launch xfce4-set-wallpaper $NEW_XFCE_BG" || true;
+        xmlstarlet ed --inplace -u \
+            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+            -v "$NEW_XFCE_BG" $XFCE_DESKTOP
+        #set ALL properties with name "last-image" to use value of new background
+        sed -i -e 's@\(name="last-image"\).*@\1 type="string" value="'"$NEW_XFCE_BG"'"/>@' \
+            $XFCE_DESKTOP
     fi
 
     # sync GNOME background to AccountsService background
@@ -333,22 +385,22 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
 
 xfce)
     # apply XFCE settings to other DEs
-    XFCE_BG_URL=$(urlencode $XFCE_BG)
+    #XFCE_BG_URL=$(urlencode $XFCE_BG)
 
     if [ $DEBUG ];
     then
         echo "Previous Session XFCE: Sync to other DEs" | tee -a $LOGFILE
-        echo "xfce bg url: $XFCE_BG_URL" | tee -a $LOGFILE
+        #echo "xfce bg url: $XFCE_BG_URL" | tee -a $LOGFILE
     fi
 
     if [ -x /usr/bin/cinnamon ];
     then
         # sync XFCE background to Cinnamon background
-        su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri 'file://$XFCE_BG_URL'" || true;
+        su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri 'file://$XFCE_BG'" || true;
     fi
 
     # sync XFCE background to GNOME background
-    su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri 'file://$XFCE_BG_URL'" || true;
+    su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri 'file://$XFCE_BG'" || true;
 
     # sync XFCE background to AccountsService background
     NEW_AS_BG="'$XFCE_BG'"
@@ -409,9 +461,6 @@ cinnamon)
             /usr/share/applications/cinnamon-settings-startup.desktop || true;
     fi
 
-    # --------------------------------------------------------------------------
-    # NEMO Settings
-    # --------------------------------------------------------------------------
     if [ -x /usr/bin/nemo ];
     then
         desktop-file-edit --remove-key=NoDisplay \
@@ -527,6 +576,9 @@ cinnamon)
             /usr/share/applications/software-properties-gnome.desktop || true;
     fi
 
+    # --------------------------------------------------------------------------
+    # XFCE Settings
+    # --------------------------------------------------------------------------
     # Thunar: hide (only installed for bulk-rename-tool)
     if [ -e /usr/share/applications/Thunar.desktop ];
     then
@@ -609,17 +661,15 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
             /usr/share/applications/nemo-compare-preferences.desktop || true;
     fi
 
-    # Thunar: hide (only installed for bulk-rename-tool)
-    if [ -e /usr/share/applications/Thunar.desktop ];
+    # cinnamon-screensaver: started but shouldn't be running
+    if [ "$(pidof cinnamon-screensaver)" ];
     then
-        desktop-file-edit --set-key=NoDisplay --set-value=true \
-            /usr/share/applications/Thunar.desktop || true;
-    fi
+        if [ $DEBUG ];
+        then
+            echo "cinnamon-screensaver is running: $(pidof cinnamon-screensaver)" | tee -a $LOGFILE
+        fi
 
-    if [ -e /usr/share/applications/thunar-settings.desktop ];
-    then
-        desktop-file-edit --set-key=NoDisplay --set-value=true \
-            /usr/share/applications/thunar-settings.desktop || true;
+       killall cinnamon-screensaver | tee -a $LOGFILE
     fi
 
     # --------------------------------------------------------------------------
@@ -695,6 +745,22 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
         desktop-file-edit --remove-key=NoDisplay \
             /usr/share/applications/software-properties-gnome.desktop || true;
     fi
+
+    # --------------------------------------------------------------------------
+    # XFCE Settings
+    # --------------------------------------------------------------------------
+    # Thunar: hide (only installed for bulk-rename-tool)
+    if [ -e /usr/share/applications/Thunar.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/Thunar.desktop || true;
+    fi
+
+    if [ -e /usr/share/applications/thunar-settings.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/thunar-settings.desktop || true;
+    fi
 ;;
 
 xfce)
@@ -706,16 +772,9 @@ xfce)
         echo "processing based on XFCE session" | tee -a $LOGFILE
     fi
 
-    # Nautilus may be active: kill (will not error if not found)
-    if [ "$(pidof nautilus-desktop)" ];
-    then
-        if [ $DEBUG ];
-        then
-            echo "nautilus running (TOP) and needs killed: $(pidof nautilus-desktop)" | tee -a $LOGFILE
-        fi
-        killall nautilus-desktop | tee -a $LOGFILE
-    fi
-
+    # --------------------------------------------------------------------------
+    # CINNAMON Settings
+    # --------------------------------------------------------------------------
     if [ -x /usr/bin/nemo ];
     then
         desktop-file-edit --remove-key=NoDisplay \
@@ -746,6 +805,30 @@ xfce)
     then
         desktop-file-edit --remove-key=NoDisplay \
             /usr/share/applications/nemo-compare-preferences.desktop || true;
+    fi
+
+    # cinnamon-screensaver: started but shouldn't be running
+    if [ "$(pidof cinnamon-screensaver)" ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "cinnamon-screensaver is running: $(pidof cinnamon-screensaver)" | tee -a $LOGFILE
+        fi
+
+       killall cinnamon-screensaver | tee -a $LOGFILE
+    fi
+
+    # --------------------------------------------------------------------------
+    # Ubuntu/GNOME Settings
+    # --------------------------------------------------------------------------
+    # Nautilus may be active: kill (will not error if not found)
+    if [ "$(pidof nautilus-desktop)" ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "nautilus running (TOP) and needs killed: $(pidof nautilus-desktop)" | tee -a $LOGFILE
+        fi
+        killall nautilus-desktop | tee -a $LOGFILE
     fi
 ;;
 
@@ -782,6 +865,7 @@ echo $CURR_SESSION > $PREV_SESSION_FILE
 # ------------------------------------------------------------------------------
 # FINISHED
 # ------------------------------------------------------------------------------
+
 if [ $DEBUG ];
 then
     if [ -x /usr/bin/nemo ];
@@ -808,10 +892,10 @@ then
     fi
     if [ -x /usr/bin/xfce4-session ];
     then
-        XFCE_BG_NEW=$(su "$CURR_USER" -c "dbus-launch xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop" || true;)
-#        XFCE_BG_NEW=$(xmlstarlet sel -T -t -m \
-#            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
-#            -v . -n $XFCE_DESKTOP)
+        #XFCE_BG_NEW=$(su "$CURR_USER" -c "dbus-launch xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop" || true;)
+        XFCE_BG_NEW=$(xmlstarlet sel -T -t -m \
+            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+            -v . -n $XFCE_DESKTOP)
         echo "xfce bg NEW: $XFCE_BG_NEW" | tee -a $LOGFILE
     fi
     GNOME_BG_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri')
@@ -824,6 +908,18 @@ then
     fi
     echo "NAUTILUS show desktop icons: $(su $CURR_USER -c 'dbus-launch gsettings get org.gnome.desktop.background show-desktop-icons')" | tee -a $LOGFILE
     echo "NAUTILUS draw background: $(su $CURR_USER -c 'dbus-launch gsettings get org.gnome.desktop.background draw-background')" | tee -a $LOGFILE
+fi
+
+# Ensure all .config files owned by user
+chown -R $CURR_USER:$CURR_USER /home/$CURR_USER/.config/
+
+# Kill dconf processes that were potentially triggered by this script that need
+#   to be restarted in order for changes to take effect: the selected desktop
+#   will restart what is needed.
+killall dconf-service
+
+if [ $DEBUG ];
+then
     echo "$(date) exiting wasta-login" | tee -a $LOGFILE
 fi
 

@@ -51,6 +51,9 @@ ubuntu-lock-on-suspend = false
 theme = 'Arc-Darker'
 titlebar-font = 'Ubuntu Bold 11'
 
+[org.gnome.shell]
+favorite-apps= ['firefox.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'wasta-backup.desktop', 'wasta-resources.desktop']
+
 [x.dm.slick-greeter]
 background = ''
 background-color = '#30343A'

@@ -15,4 +15,4 @@ Description: Wasta-Linux MultiDesktop
  A lightdm script is executed on login to make necessary adjustments based
  on detected session in comparison to previously detected session.
  .
- Currently KDE, MATE, and XFCE are not supported: only GNOME and Cinnamon.
+ Currently only GNOME, Cinnamon, and XFCE are supported.

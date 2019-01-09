@@ -53,6 +53,7 @@
 #   2018-09-02 rik: user-level: copy in zim prefs if don't already exist
 #   2018-09-02 rik: hide thunar from cinnamon or ubuntu/gnome sessions
 #   2018-12-16 rik: initial xfce support added for 18.04
+#   2019-01-10 rik: correcting get and set xfce background
 #
 # ==============================================================================
 
@@ -130,12 +131,13 @@ then
 fi
 
 XFCE_DESKTOP="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
-if [ -e $XFCE_DESKTOP ];
+if [ -x /usr/bin/xfce4-session ];
 then
     #xfce: NO "file://" preceeding filename
-    XFCE_BG=$(xmlstarlet sel -T -t -m \
-        '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
-        -v . -n $XFCE_DESKTOP)
+#    XFCE_BG=$(xmlstarlet sel -T -t -m \
+#        '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+#        -v . -n $XFCE_DESKTOP)
+    XFCE_BG=$(su "$CURR_USER" -c "xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop" || true;)
 fi
 
 #gnome: "file://" preceeds filename
@@ -143,10 +145,8 @@ fi
 #   unicode characters present
 GNOME_BG_URL=$(su "$CURR_USER" -c "dbus-launch gsettings get org.gnome.desktop.background picture-uri" || true;)
 GNOME_BG=$(urldecode $GNOME_BG_URL)
-echo "gnome bg: $GNOME_BG"
 
 AS_FILE="/var/lib/AccountsService/users/$CURR_USER"
-
 # Lightdm 1.26 uses a more standardized syntax for storing user backgrounds.
 #   Since individual desktops would need to re-work how to set user backgrounds
 #   for use by lightdm we are doing it manually here to ensure compatiblity
@@ -165,9 +165,10 @@ if [ $DEBUG ];
 then
     if [ -x /usr/bin/cinnamon ];
     then
-        echo "cinnamon bg: $CINNAMON_BG" | tee -a $LOGFILE
+        echo "cinnamon bg url encoded: $CINNAMON_BG_URL" | tee -a $LOGFILE
+        echo "cinnamon bg url decoded: $CINNAMON_BG" | tee -a $LOGFILE
     fi
-    if [ -e $XFCE_DESKTOP ];
+    if [ -x /usr/bin/xfce4-session ];
     then
         echo "xfce bg: $XFCE_BG" | tee -a $LOGFILE
     fi
@@ -250,7 +251,7 @@ cinnamon)
     # sync Cinnamon background to GNOME background
     su "$CURR_USER" -c "dbus-launch gsettings set org.gnome.desktop.background picture-uri $CINNAMON_BG" || true;
 
-    if [ -e $XFCE_DESKTOP ];
+    if [ -x /usr/bin/xfce4-session ];
     then
         # sync Cinnamon background to XFCE background
         NEW_XFCE_BG=$(echo "$CINNAMON_BG" | sed "s@'file://@@" | sed "s@'\$@@")
@@ -258,12 +259,13 @@ cinnamon)
         then
             echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
         fi
+        su "$CURR_USER" -c "xfce4-set-wallpaper $NEW_XFCE_BG" || true;
         #xmlstarlet ed --inplace -u \
         #    '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
         #    -v "$NEW_XFCE_BG" $XFCE_DESKTOP
         #set ALL properties with name "last-image" to use value of new background
-        sed -i -e 's@\(name="last-image"\).*@\1 type="string" value="'"$NEW_XFCE_BG"'"/>@' \
-            $XFCE_DESKTOP
+        #sed -i -e 's@\(name="last-image"\).*@\1 type="string" value="'"$NEW_XFCE_BG"'"/>@' \
+        #    $XFCE_DESKTOP
     fi
 
     # sync Cinnamon background to AccountsService background
@@ -287,13 +289,18 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
         su "$CURR_USER" -c "dbus-launch gsettings set org.cinnamon.desktop.background picture-uri $GNOME_BG" || true;
     fi
 
-    if [ -e "$XFCE_DESKTOP" ];
+    if [ -x /usr/bin/xfce4-session ];
     then
         # sync GNOME background to XFCE background
         NEW_XFCE_BG=$(echo "$GNOME_BG" | sed "s@'file://@@" | sed "s@'\$@@")
-        xmlstarlet ed --inplace -u \
-            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
-            -v "$NEW_XFCE_BG" $XFCE_DESKTOP
+        if [ $DEBUG ];
+        then
+            echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
+        fi
+        su "$CURR_USER" -c "xfce4-set-wallpaper $NEW_XFCE_BG" || true;
+#        xmlstarlet ed --inplace -u \
+#            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+#            -v "$NEW_XFCE_BG" $XFCE_DESKTOP
     fi
 
     # sync GNOME background to AccountsService background
@@ -776,11 +783,12 @@ then
         CINNAMON_BG_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.cinnamon.desktop.background picture-uri')
         echo "cinnamon bg NEW: $CINNAMON_BG_NEW" | tee -a $LOGFILE
     fi
-    if [ -e "$XFCE_DESKTOP" ];
+    if [ -x /usr/bin/xfce4-session ];
     then
-        XFCE_BG_NEW=$(xmlstarlet sel -T -t -m \
-            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
-            -v . -n $XFCE_DESKTOP)
+        XFCE_BG_NEW=$(su "$CURR_USER" -c "xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop" || true;)
+#        XFCE_BG_NEW=$(xmlstarlet sel -T -t -m \
+#            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
+#            -v . -n $XFCE_DESKTOP)
         echo "xfce bg NEW: $XFCE_BG_NEW" | tee -a $LOGFILE
     fi
     GNOME_BG_NEW=$(su "$CURR_USER" -c 'dbus-launch gsettings get org.gnome.desktop.background picture-uri')

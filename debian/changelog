@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.3) UNRELEASED; urgency=medium
+
+  * wasta-login.sh: correcting get and set xfce background
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 09 Jan 2019 09:40:36 +0300
+
 wasta-multidesktop-bionic (1.2.2) bionic; urgency=medium
 
   * schemas: adding Wasta customized Gnome settings (wasta-core gives default

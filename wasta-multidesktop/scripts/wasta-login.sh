@@ -157,7 +157,7 @@ then
 #    XFCE_BG=$(xmlstarlet sel -T -t -m \
 #        '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
 #        -v . -n $XFCE_DESKTOP)
-    XFCE_BG=$(su "$CURR_USER" -c "xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop")
+    XFCE_BG=$(su "$CURR_USER" -c "dbus-launch xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop")
 fi
 
 #gnome: "file://" precedes filename
@@ -279,7 +279,7 @@ cinnamon)
         then
             echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
         fi
-        su "$CURR_USER" -c "xfce4-set-wallpaper $NEW_XFCE_BG"
+        su "$CURR_USER" -c "dbus-launch xfce4-set-wallpaper $NEW_XFCE_BG" || true;
         #xmlstarlet ed --inplace -u \
         #    '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
         #    -v "$NEW_XFCE_BG" $XFCE_DESKTOP
@@ -317,7 +317,7 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
         then
             echo "Attempting to set NEW_XFCE_BG: $NEW_XFCE_BG" | tee -a $LOGFILE
         fi
-        su "$CURR_USER" -c "xfce4-set-wallpaper $NEW_XFCE_BG" || true;
+        su "$CURR_USER" -c "dbus-launch xfce4-set-wallpaper $NEW_XFCE_BG" || true;
 #        xmlstarlet ed --inplace -u \
 #            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
 #            -v "$NEW_XFCE_BG" $XFCE_DESKTOP
@@ -808,7 +808,7 @@ then
     fi
     if [ -x /usr/bin/xfce4-session ];
     then
-        XFCE_BG_NEW=$(su "$CURR_USER" -c "xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop" || true;)
+        XFCE_BG_NEW=$(su "$CURR_USER" -c "dbus-launch xfconf-query -p /backdrop/screen0/monitor0/workspace0/last-image -c xfce4-desktop" || true;)
 #        XFCE_BG_NEW=$(xmlstarlet sel -T -t -m \
 #            '//channel[@name="xfce4-desktop"]/property[@name="backdrop"]/property[@name="screen0"]/property[@name="monitor0"]/property[@name="workspace0"]/property[@name="last-image"]/@value' \
 #            -v . -n $XFCE_DESKTOP)

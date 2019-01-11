@@ -1,8 +1,10 @@
 wasta-multidesktop-bionic (1.2.5) bionic; urgency=medium
 
   * debian/control: adding theme items as recommends
+  * wasta-login.sh: restoring xfce panel clock settings if missing:
+    https://askubuntu.com/questions/959339/xfce-panel-clock-disappears
 
- -- Rik Shaw <rikshaw76@gmail.com>  Fri, 11 Jan 2019 10:37:43 +0300
+ -- Rik Shaw <rikshaw76@gmail.com>  Fri, 11 Jan 2019 12:27:54 +0300
 
 wasta-multidesktop-bionic (1.2.4) bionic; urgency=medium
 

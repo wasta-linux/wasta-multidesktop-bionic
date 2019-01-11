@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.5) bionic; urgency=medium
+
+  * debian/control: adding theme items as recommends
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Fri, 11 Jan 2019 10:37:43 +0300
+
 wasta-multidesktop-bionic (1.2.4) bionic; urgency=medium
 
   * wasta-login.sh: killall user-level dbus-daemon at the end

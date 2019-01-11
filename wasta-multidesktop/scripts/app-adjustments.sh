@@ -336,19 +336,10 @@ fi
 # ------------------------------------------------------------------------------
 # cinnamon-settings-users
 # ------------------------------------------------------------------------------
-# add to XFCE Settings Manager
+# remove from xfce (now use gnome-system-tools users.desktop)
 if [ -e /usr/share/applications/cinnamon-settings-users.desktop ];
 then
-    desktop-file-edit --add-category=Settings \
-        /usr/share/applications/cinnamon-settings-users.desktop
-
-    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
-        /usr/share/applications/cinnamon-settings-users.desktop
-
-    desktop-file-edit --add-category=X-XFCE-SystemSettings \
-        /usr/share/applications/cinnamon-settings-users.desktop
-
-    desktop-file-edit --add-only-show-in=XFCE \
+    desktop-file-edit --remove-only-show-in=XFCE \
         /usr/share/applications/cinnamon-settings-users.desktop
 fi
 
@@ -642,6 +633,17 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# network
+# ------------------------------------------------------------------------------
+# Installed by gnome-system-tools (for XFCE) but don't need this one, even
+#   though has one nice feature allowing user to change system name with a GUI
+if [ -e /usr/share/applications/users.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/users.desktop || true;
+fi
+
+# ------------------------------------------------------------------------------
 # nm-connection-editor
 # ------------------------------------------------------------------------------
 # add to XFCE Settings Manager
@@ -770,6 +772,25 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# time (from gnome-system-tools)
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/time.desktop ];
+then
+    desktop-file-edit --add-only-show-in=XFCE \
+        /usr/share/applications/time.desktop
+
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/time.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/time.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SystemSettings \
+        /usr/share/applications/time.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # ubiquity
 # ------------------------------------------------------------------------------
 if [ -e /usr/share/ubiquity/localechooser-apply ];
@@ -788,17 +809,6 @@ then
     #   ubuntu that I am not fixing (invalid use of "'" in Exec line)
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/ubiquity.desktop > /dev/null 2>&1 || true;
-fi
-
-# ------------------------------------------------------------------------------
-# vim
-# ------------------------------------------------------------------------------
-# always hide
-if [ -e /usr/share/applications/vim.desktop ];
-then
-    # hide from main menu (terminal only)
-    desktop-file-edit --set-key=NoDisplay --set-value=true \
-        /usr/share/applications/vim.desktop
 fi
 
 # ------------------------------------------------------------------------------
@@ -822,6 +832,25 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# users (from gnome-system-tools)
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/users.desktop ];
+then
+    desktop-file-edit --add-only-show-in=XFCE \
+        /usr/share/applications/users.desktop
+
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/users.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/users.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SystemSettings \
+        /usr/share/applications/users.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # uxterm, xterm
 # ------------------------------------------------------------------------------
 # pulled in by bloom(??)
@@ -835,6 +864,17 @@ if [ -e /usr/share/applications/debian-xterm.desktop ];
 then
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/debian-xterm.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# vim
+# ------------------------------------------------------------------------------
+# always hide
+if [ -e /usr/share/applications/vim.desktop ];
+then
+    # hide from main menu (terminal only)
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/vim.desktop
 fi
 
 # ------------------------------------------------------------------------------

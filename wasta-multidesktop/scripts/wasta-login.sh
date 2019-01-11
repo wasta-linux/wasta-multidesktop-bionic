@@ -841,6 +841,10 @@ xfce)
     # --------------------------------------------------------------------------
     # XFCE Settings
     # --------------------------------------------------------------------------
+
+    # xfce clock applet loses it's config if opened and closed without first
+    #    stopping the xfce4-panel.  So reset to defaults
+    # https://askubuntu.com/questions/959339/xfce-panel-clock-disappears
     XFCE_DEFAULT_PANEL="/etc/xdg/xdg-xfce/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
     XFCE_PANEL="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
     if ! [ -e $XFCE_PANEL ];
@@ -853,10 +857,6 @@ xfce)
         cp $XFCE_DEFAULT_PANEL $XFCE_PANEL
     fi
 
-    # xfce clock applet loses it's config if opened and closed without first
-    #    stopping the xfce4-panel.  So reset to defaults
-    # https://askubuntu.com/questions/959339/xfce-panel-clock-disappears
-    #
     # using xmlstarlet since can't be sure of clock plugin #
     DEFAULT_DIGITAL_FORMAT=$(xmlstarlet sel -T -t -m \
         '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="digital-format"]/@value' \
@@ -974,9 +974,6 @@ then
     echo "NAUTILUS draw background: $(su $CURR_USER -c 'dbus-launch gsettings get org.gnome.desktop.background draw-background')" | tee -a $LOGFILE
 fi
 
-# Ensure all .config files owned by user
-chown -R $CURR_USER:$CURR_USER /home/$CURR_USER/.config/
-
 # Kill dconf processes that were potentially triggered by this script that need
 #   to be restarted in order for changes to take effect: the selected desktop
 #   will restart what is needed.
@@ -984,6 +981,11 @@ killall dconf-service
 # Kill dbus-daemon only under user account or else will crash back to lightdm
 #   login screen
 su "$CURR_USER" -c "killall dbus-daemon"
+
+# Ensure files correctly owned by user
+chown -R $CURR_USER:$CURR_USER /home/$CURR_USER/.cache/
+chown -R $CURR_USER:$CURR_USER /home/$CURR_USER/.config/
+chown -R $CURR_USER:$CURR_USER /home/$CURR_USER/.dbus/
 
 if [ $DEBUG ];
 then

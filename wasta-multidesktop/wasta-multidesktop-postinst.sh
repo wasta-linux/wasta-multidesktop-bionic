@@ -33,7 +33,8 @@ fi
 # ------------------------------------------------------------------------------
 # Main Processing
 # ------------------------------------------------------------------------------
-
+# Setup Directory for later reference
+DIR=/usr/share/wasta-multidesktop
 
 #WASTA_SYSTEMD=$(systemctl is-enabled wasta-logout || true);
 
@@ -119,6 +120,12 @@ sed -i -e '$a gtk-primary-button-warps-slider = false' \
     /etc/gtk-3.0/settings.ini
 
 # per-theme settings done in app-adjustments since could be reverted
+
+# ------------------------------------------------------------------------------
+# app-adjustments
+# ------------------------------------------------------------------------------
+# run app-adjustments.sh
+bash $DIR/scripts/app-adjustments.sh || true;
 
 # ------------------------------------------------------------------------------
 # Dconf / Gsettings Default Value adjustments

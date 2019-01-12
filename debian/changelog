@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.6) bionic; urgency=medium
+
+  * app-adjustments.sh: add several utilities to xfce settings manager
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sat, 12 Jan 2019 12:34:02 +0300
+
 wasta-multidesktop-bionic (1.2.5) bionic; urgency=medium
 
   * debian/control: adding theme items as recommends

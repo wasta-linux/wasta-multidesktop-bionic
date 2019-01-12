@@ -482,6 +482,22 @@ fi
 #fi
 
 # ------------------------------------------------------------------------------
+# gnome-language-selector
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/gnome-language-selector.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/gnome-language-selector.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/gnome-language-selector.desktop
+
+    desktop-file-edit --add-category=X-XFCE-PersonalSettings \
+        /usr/share/applications/gnome-language-selector.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # gnome-power-statistics
 # ------------------------------------------------------------------------------
 # always show
@@ -593,6 +609,22 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# menulibre
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/menulibre.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/menulibre.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/menulibre.desktop
+
+    desktop-file-edit --add-category=X-XFCE-PersonalSettings \
+        /usr/share/applications/menulibre.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # modem-manager-gui
 # ------------------------------------------------------------------------------
 # change "Categories" to "Utility" ("Accessories"): default is "System
@@ -612,6 +644,22 @@ then
     # modify comment so easier to find on search
     desktop-file-edit --set-comment="3G USB Modem Manager" \
         /usr/share/applications/modem-manager-gui.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# mugshot
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/mugshot.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/mugshot.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/mugshot.desktop
+
+    desktop-file-edit --add-category=X-XFCE-PersonalSettings \
+        /usr/share/applications/mugshot.desktop
 fi
 
 # ------------------------------------------------------------------------------
@@ -640,7 +688,7 @@ fi
 if [ -e /usr/share/applications/users.desktop ];
 then
     desktop-file-edit --set-key=NoDisplay --set-value=true \
-        /usr/share/applications/users.desktop || true;
+        /usr/share/applications/network.desktop || true;
 fi
 
 # ------------------------------------------------------------------------------
@@ -755,6 +803,22 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# software-properties-drivers
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/software-properties-drivers.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/software-properties-drivers.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/software-properties-drivers.desktop
+
+    desktop-file-edit --add-category=X-XFCE-HardwareSettings \
+        /usr/share/applications/software-properties-drivers.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # software-properties-gnome,gtk
 # ------------------------------------------------------------------------------
 if [ -e /usr/share/applications/software-properties-gnome.desktop ];
@@ -762,6 +826,16 @@ then
     # rename to "Software Settings" or else get confused with "Software Updates"
     desktop-file-edit --set-name="Software Settings" \
         /usr/share/applications/software-properties-gnome.desktop
+
+    # add to XFCE Settings Manager
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/software-properties-gtk.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/software-properties-gtk.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SystemSettings \
+        /usr/share/applications/software-properties-gtk.desktop
 fi
 
 if [ -e /usr/share/applications/software-properties-gtk.desktop ];
@@ -769,6 +843,32 @@ then
     # rename to "Software Settings" or else get confused with "Software Updates"
     desktop-file-edit --set-name="Software Settings" \
         /usr/share/applications/software-properties-gtk.desktop
+
+    # add to XFCE Settings Manager
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/software-properties-gtk.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/software-properties-gtk.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SystemSettings \
+        /usr/share/applications/software-properties-gtk.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# system-config-printer
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/system-config-printer.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/system-config-printer.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/system-config-printer.desktop
+
+    desktop-file-edit --add-category=X-XFCE-HardwareSettings \
+        /usr/share/applications/system-config-printer.desktop
 fi
 
 # ------------------------------------------------------------------------------
@@ -829,6 +929,22 @@ then
     # hide from main menu
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/ubuntu-amazon-default.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# update-manager
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+if [ -e /usr/share/applications/update-manager.desktop ];
+then
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/update-manager.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/update-manager.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SystemSettings \
+        /usr/share/applications/update-manager.desktop
 fi
 
 # ------------------------------------------------------------------------------

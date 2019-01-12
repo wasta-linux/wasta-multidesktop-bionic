@@ -614,14 +614,15 @@ fi
 # add to XFCE Settings Manager
 if [ -e /usr/share/applications/menulibre.desktop ];
 then
+    # send output to null since warnings from OnlyShowIn key
     desktop-file-edit --add-category=Settings \
-        /usr/share/applications/menulibre.desktop
+        /usr/share/applications/menulibre.desktop >/dev/null 2>&1 || true;
 
     desktop-file-edit --add-category=X-XFCE-SettingsDialog \
-        /usr/share/applications/menulibre.desktop
+        /usr/share/applications/menulibre.desktop >/dev/null 2>&1 || true;
 
     desktop-file-edit --add-category=X-XFCE-PersonalSettings \
-        /usr/share/applications/menulibre.desktop
+        /usr/share/applications/menulibre.desktop >/dev/null 2>&1 || true;
 fi
 
 # ------------------------------------------------------------------------------
@@ -808,6 +809,14 @@ fi
 # add to XFCE Settings Manager
 if [ -e /usr/share/applications/software-properties-drivers.desktop ];
 then
+    #rik: no trailing space after HardwareSettings so remove and re-add
+    #     otherwise additional added categories will have an error
+    desktop-file-edit --remove-category=HardwareSettings \
+        /usr/share/applications/software-properties-drivers.desktop
+
+    desktop-file-edit --add-category=HardwareSettings \
+        /usr/share/applications/software-properties-drivers.desktop
+
     desktop-file-edit --add-category=Settings \
         /usr/share/applications/software-properties-drivers.desktop
 

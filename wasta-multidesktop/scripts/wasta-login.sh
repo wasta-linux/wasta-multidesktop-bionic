@@ -500,6 +500,16 @@ cinnamon)
             /usr/share/applications/nemo-compare-preferences.desktop || true;
     fi
 
+    # ENABLE cinnamon-screensaver
+    if [ -e /usr/share/dbus-1/services/org.cinnamon.ScreenSaver.service.disabled ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "enabling cinnamon-screensaver for cinnamon session" | tee -a $LOGFILE
+        fi
+        mv /usr/share/dbus-1/services/org.cinnamon.ScreenSaver.service{.disabled,}
+    fi
+
     # --------------------------------------------------------------------------
     # Ubuntu/GNOME Settings
     # --------------------------------------------------------------------------
@@ -581,6 +591,16 @@ cinnamon)
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/software-properties-gnome.desktop || true;
+    fi
+
+    # ENABLE notify-osd
+    if [ -e /usr/share/dbus-1/services/org.freedesktop.Notifications.service.disabled ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "enabling notify-osd for cinnamon session" | tee -a $LOGFILE
+        fi
+        mv /usr/share/dbus-1/services/org.freedesktop.Notifications.service{.disabled,}
     fi
 
     # --------------------------------------------------------------------------
@@ -668,15 +688,14 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
             /usr/share/applications/nemo-compare-preferences.desktop || true;
     fi
 
-    # cinnamon-screensaver: started but shouldn't be running
-    if [ "$(pidof cinnamon-screensaver)" ];
+    # DISABLE cinnamon-screensaver
+    if [ -e /usr/share/dbus-1/services/org.cinnamon.ScreenSaver.service ];
     then
         if [ $DEBUG ];
         then
-            echo "cinnamon-screensaver is running: $(pidof cinnamon-screensaver)" | tee -a $LOGFILE
+            echo "disabling cinnamon-screensaver for gnome/ubuntu session" | tee -a $LOGFILE
         fi
-
-       killall cinnamon-screensaver | tee -a $LOGFILE
+        mv /usr/share/dbus-1/services/org.cinnamon.ScreenSaver.service{,.disabled}
     fi
 
     # --------------------------------------------------------------------------
@@ -753,6 +772,16 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
             /usr/share/applications/software-properties-gnome.desktop || true;
     fi
 
+    # ENABLE notify-osd
+    if [ -e /usr/share/dbus-1/services/org.freedesktop.Notifications.service.disabled ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "enabling notify-osd for gnome/ubuntu session" | tee -a $LOGFILE
+        fi
+        mv /usr/share/dbus-1/services/org.freedesktop.Notifications.service{.disabled,}
+    fi
+
     # --------------------------------------------------------------------------
     # XFCE Settings
     # --------------------------------------------------------------------------
@@ -814,15 +843,14 @@ xfce)
             /usr/share/applications/nemo-compare-preferences.desktop || true;
     fi
 
-    # cinnamon-screensaver: started but shouldn't be running
-    if [ "$(pidof cinnamon-screensaver)" ];
+    # DISABLE cinnamon-screensaver
+    if [ -e /usr/share/dbus-1/services/org.cinnamon.ScreenSaver.service ];
     then
         if [ $DEBUG ];
         then
-            echo "cinnamon-screensaver is running: $(pidof cinnamon-screensaver)" | tee -a $LOGFILE
+            echo "disabling cinnamon-screensaver for xfce session" | tee -a $LOGFILE
         fi
-
-       killall cinnamon-screensaver | tee -a $LOGFILE
+        mv /usr/share/dbus-1/services/org.cinnamon.ScreenSaver.service{,.disabled}
     fi
 
     # --------------------------------------------------------------------------
@@ -836,6 +864,16 @@ xfce)
             echo "nautilus running (TOP) and needs killed: $(pidof nautilus-desktop)" | tee -a $LOGFILE
         fi
         killall nautilus-desktop | tee -a $LOGFILE
+    fi
+
+    # DISABLE notify-osd (xfce uses xfce4-notifyd)
+    if [ -e /usr/share/dbus-1/services/org.freedesktop.Notifications.service ];
+    then
+        if [ $DEBUG ];
+        then
+            echo "disabling notify-osd for xfce session" | tee -a $LOGFILE
+        fi
+        mv /usr/share/dbus-1/services/org.freedesktop.Notifications.service{,.disabled}
     fi
 
     # --------------------------------------------------------------------------

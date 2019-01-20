@@ -140,10 +140,30 @@ then
         /usr/share/themes/Arc-Dark/gtk-3.0/gtk.css \
         /usr/share/themes/Arc-Darker/gtk-3.0/gtk.css
 
-    #add:
+    # then add:
     sed -i -e "$ a @import url(\"$DIR/resources/gtk-whiskermenu-wasta.css\");" \
         /usr/share/themes/Arc-Dark/gtk-3.0/gtk.css \
         /usr/share/themes/Arc-Darker/gtk-3.0/gtk.css
+
+    # make Arc themes compatible with xfce4-windowck-plugin (not sure why
+    #   the .svg is not recognized by the code, but adding the .png solves it)
+    if ! [ -e "/usr/share/themes/Arc/unity/close_focused_normal.png" ];
+    then
+        ln -s /usr/share/themes/Arc/unity/close_focused_normal.svg \
+            /usr/share/themes/Arc/unity/close_focused_normal.png
+    fi
+
+    if ! [ -e "/usr/share/themes/Arc-Dark/unity/close_focused_normal.png" ];
+    then
+        ln -s /usr/share/themes/Arc-Dark/unity/close_focused_normal.svg \
+            /usr/share/themes/Arc-Dark/unity/close_focused_normal.png
+    fi
+
+    if ! [ -e "/usr/share/themes/Arc-Darker/unity/close_focused_normal.png" ];
+    then
+        ln -s /usr/share/themes/Arc-Darker/unity/close_focused_normal.svg \
+            /usr/share/themes/Arc-Darker/unity/close_focused_normal.png
+    fi
 
 # 2017-12 rik: for 18.04 below is making the scrollbar box really fat so disabling
 #    # scrollbars: "add arrow at top":
@@ -1066,6 +1086,16 @@ if [ -e /usr/share/applications/xdiagnose.desktop ];
 then
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/xdiagnose.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# xfce-settings-manager
+# ------------------------------------------------------------------------------
+if [ -e /usr/share/applications/xfce-settings-manager.desktop ];
+then
+    # Change comment so found by "system, control, panel"
+    desktop-file-edit --set-comment="Graphical System Control Panel for Xfce 4" \
+        /usr/share/applications/xfce-settings-manager.desktop
 fi
 
 # ------------------------------------------------------------------------------

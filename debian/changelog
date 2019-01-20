@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.2.7) bionic; urgency=medium
+
+  * app-adjustments.sh: add "control, panel, system" to xfce-settings-manager
+    comment so found by search
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sun, 20 Jan 2019 17:52:54 +0300
+
 wasta-multidesktop-bionic (1.2.6) bionic; urgency=medium
 
   * app-adjustments.sh: add several utilities to xfce settings manager

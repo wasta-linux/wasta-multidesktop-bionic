@@ -61,6 +61,7 @@
 # 2019-01-08 rik: disabling wasta-ibus script for now since there have been some
 #     issues with ibus user settings getting corrupted.
 #   - adding items to XFCE Settings Manager
+# 2019-01-23 rik: hiding texdoctk (installed by Paratext)
 #
 # ==============================================================================
 
@@ -898,6 +899,16 @@ then
 
     desktop-file-edit --add-category=X-XFCE-HardwareSettings \
         /usr/share/applications/system-config-printer.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# texdoctk
+# ------------------------------------------------------------------------------
+# hide if found (Paratext installs but don't want to clutter menu)
+if [ -e /usr/share/applications/texdoctk.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/texdoctk.desktop
 fi
 
 # ------------------------------------------------------------------------------

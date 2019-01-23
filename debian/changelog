@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.8) bionic; urgency=medium
+
+  * wasta-login.sh: "smart" kill of dconf-service and dbus-daemon
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 23 Jan 2019 11:20:03 +0300
+
 wasta-multidesktop-bionic (1.2.7) bionic; urgency=medium
 
   * app-adjustments.sh: add "control, panel, system" to xfce-settings-manager

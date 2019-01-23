@@ -61,32 +61,14 @@
 #   2019-01-12 rik: restoring clock panel applet settings (bug loses them
 #       if don't restart the panel before closing the applet settings:
 #       https://askubuntu.com/questions/959339/xfce-panel-clock-disappears)
+#   2019-01-23 rik: only killing dconf-service and dbus-daemon that were *not*
+#       running before wasta-login.sh started.
 #
 # ==============================================================================
 
 # function: urldecode used to decode gnome picture-uri
 # https://stackoverflow.com/questions/6250698/how-to-decode-url-encoded-string-in-shell
 urldecode(){ : "${*//+/ }"; echo -e "${_//%/\\x}"; }
-
-# update: trying below:
-# https://askubuntu.com/questions/53770/how-can-i-encode-and-decode-percent-encoded-strings-on-the-command-line
-#urlencode() {
-#    # urlencode <string>
-#    local length="${#1}"
-#    for (( i = 0; i < length; i++ )); do
-#        local c="${1:i:1}"
-#        case $c in
-#            [a-zA-Z0-9.~_-:/]) printf "$c" ;;
-#            *) printf '%%%02X' "'$c"
-#        esac
-#    done
-#}
-#
-#urldecode() {
-#    # urldecode <string>
-#    local url_encoded="${1//+/ }"
-#    printf '%b' "${url_encoded//%/\\x}"
-#}
 
 # ------------------------------------------------------------------------------
 # Initial Setup
@@ -102,6 +84,8 @@ LOGFILE=/var/log/wasta-multidesktop/wasta-login.txt
 PREV_SESSION_FILE=/var/log/wasta-multidesktop/$CURR_USER-prev-session
 PREV_SESSION=$(cat $PREV_SESSION_FILE)
 DEBUG_FILE=/var/log/wasta-multidesktop/wasta-login-debug
+PID_DCONF=$(pidof dconf-service)
+PID_DBUS=$(pidof dbus-daemon)
 
 if [ -e $DEBUG_FILE ];
 then
@@ -1015,10 +999,37 @@ fi
 # Kill dconf processes that were potentially triggered by this script that need
 #   to be restarted in order for changes to take effect: the selected desktop
 #   will restart what is needed.
-killall dconf-service
-# Kill dbus-daemon only under user account or else will crash back to lightdm
-#   login screen
-su "$CURR_USER" -c "killall dbus-daemon"
+#killall dconf-service
+END_PID_DCONF=$(pidof dconf-service)
+if ! [ "$PID_DCONF" ];
+then
+    # no previous DCONF pid so remove all current
+    REMOVE_PID_DCONF=$END_PID_DCONF
+else
+    REMOVE_PID_DCONF=$(echo $END_PID_DCONF | sed -e "s@$PID_DCONF@@")
+fi
+
+END_PID_DBUS=$(pidof dbus-daemon)
+if ! [ "$PID_DBUS" ];
+then
+    # no previous DBUS pid so remove all current
+    REMOVE_PID_DBUS=$END_PID_DBUS
+else
+    REMOVE_PID_DBUS=$(echo $END_PID_DBUS | sed -e "s@$PID_DBUS@@")
+fi
+
+if [ $DEBUG ];
+then
+    echo "dconf pid start: $PID_DCONF" | tee -a $LOGFILE
+    echo "dconf pid end: $END_PID_DCONF" | tee -a $LOGFILE
+    echo "dconf pid to kill: $REMOVE_PID_DCONF" | tee -a $LOGFILE
+    echo "dbus pid start: $PID_DBUS" | tee -a $LOGFILE
+    echo "dbus pid end: $END_PID_DBUS" | tee -a $LOGFILE
+    echo "dbus pid to kill: $REMOVE_PID_DBUS" | tee -a $LOGFILE
+fi
+
+kill -9 $REMOVE_PID_DCONF
+kill -9 $REMOVE_PID_DBUS
 
 # Ensure files correctly owned by user
 chown -R $CURR_USER:$CURR_USER /home/$CURR_USER/.cache/

@@ -300,7 +300,7 @@ then
     # appindicator compatibility + manual minimize (xfce can't mimimize as
     # the "insides" of the window are minimized and don't exist but the
     # empty window frame remains behind: so close Skype window after 10 seconds)
-    desktop-file-edit --set-key=Exec --set-value="env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U && sleep 10 && wmctrl -c Skype" \
+    desktop-file-edit --set-key=Exec --set-value="sh -c 'env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U && sleep 10 && wmctrl -c Skype'" \
         /home/$CURR_USER/.config/autostart/skypeforlinux.desktop
 fi
 

@@ -803,7 +803,7 @@ fi
 # appindicator compatibility
 if [ -e /usr/share/applications/skypeforlinux.desktop ];
 then
-    desktop-file-edit --set-key=Exec --set-value="env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U" \
+    desktop-file-edit --set-key=Exec --set-value="sh -c 'env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U'" \
         /usr/share/applications/skypeforlinux.desktop
 fi
 

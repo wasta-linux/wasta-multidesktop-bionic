@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.11) bionic; urgency=medium
+
+  * wasta-login, app-adjustments: wrap skype Exec with sh -c 'command'
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 30 Jan 2019 14:30:00 +0300
+
 wasta-multidesktop-bionic (1.2.10) bionic; urgency=medium
 
   * wasta-login: xfce disable skypeforlinux launchMinimized (so

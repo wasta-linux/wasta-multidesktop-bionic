@@ -1,7 +1,12 @@
+wasta-multidesktop-bionic (1.2.12) bionic; urgency=medium
+
+  * minor cleanup to wasta-login from previous changes
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 30 Jan 2019 21:14:43 +0300
+
 wasta-multidesktop-bionic (1.2.11) bionic; urgency=medium
 
   * wasta-login, app-adjustments: wrap skype Exec with sh -c 'command'
-    - other cleanups
 
  -- Rik Shaw <rikshaw76@gmail.com>  Wed, 30 Jan 2019 21:05:26 +0300
 

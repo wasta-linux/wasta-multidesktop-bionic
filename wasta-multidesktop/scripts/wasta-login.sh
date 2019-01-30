@@ -297,8 +297,10 @@ fi
 #   https://askubuntu.com/questions/1033599/how-to-remove-skypes-double-icon-in-ubuntu-18-04-mate-tray
 if [ -e /home/$CURR_USER/.config/autostart/skypeforlinux.desktop ];
 then
-    # appindicator compatibility
-    desktop-file-edit --set-key=Exec --set-value="env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U" \
+    # appindicator compatibility + manual minimize (xfce can't mimimize as
+    # the "insides" of the window are minimized and don't exist but the
+    # empty window frame remains behind: so close Skype window after 10 seconds)
+    desktop-file-edit --set-key=Exec --set-value="env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U && sleep 10 && wmctrl -c Skype" \
         /home/$CURR_USER/.config/autostart/skypeforlinux.desktop
 fi
 
@@ -877,6 +879,17 @@ xfce)
     # --------------------------------------------------------------------------
     # XFCE Settings
     # --------------------------------------------------------------------------
+
+    # skypeforlinux: can't start minimized in xfce or will end up with an
+    # empty window frame that can't be closed (without re-activating the
+    # empty frame by clicking on the panel icon).  Note above skypeforlinux
+    # autolaunch will always start it minimized (after 10 second delay)
+    if -e [ /home/$CURR_USER/.config/skypeforlinux/settings.json ]
+    then
+        # set launchMinimized = false
+        sed -i -e 's@"app.launchMinimized":true@"app.launchMinimized":false@' \
+            /home/$CURR_USER/.config/skypeforlinux/settings.json
+    fi
 
     # xfce clock applet loses it's config if opened and closed without first
     #    stopping the xfce4-panel.  So reset to defaults

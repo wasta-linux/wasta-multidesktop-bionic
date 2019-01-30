@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.2.10) bionic; urgency=medium
+
+  * wasta-login: xfce disable skypeforlinux launchMinimized (so
+    won't leave behind an empty window)
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 30 Jan 2019 12:19:52 +0300
+
 wasta-multidesktop-bionic (1.2.9) bionic; urgency=medium
 
   * wasta-login, app-adjustments: skypeforlinux appindicator compatibility

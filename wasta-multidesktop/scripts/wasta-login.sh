@@ -162,15 +162,15 @@ if [ -x /usr/bin/xfce4-session ];
 then
     XFCE_DEFAULT_SETTINGS="/etc/xdg/xdg-xfce/xfce4/"
     XFCE_SETTINGS="/home/$CURR_USER/.config/xfce4/"
-    if ! [ -e $XFCE_SETTINGS ];
-    then
-        if [ $DEBUG ];
-        then
-            echo "Creating xfce4 settings for user" | tee -a $LOGFILE
-        fi
-        mkdir -p $XFCE_SETTINGS
-        cp -r $XFCE_DEFAULT_SETTINGS $XFCE_SETTINGS
-    fi
+    #if ! [ -e $XFCE_SETTINGS ];
+    #then
+    #    if [ $DEBUG ];
+    #    then
+    #        echo "Creating xfce4 settings folder for user" | tee -a $LOGFILE
+    #    fi
+    #    mkdir -p $XFCE_SETTINGS
+    #    # cp -r $XFCE_DEFAULT_SETTINGS $XFCE_SETTINGS
+    #fi
 
     XFCE_DEFAULT_DESKTOP="/etc/xdg/xdg-xfce/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
     XFCE_DESKTOP="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
@@ -300,7 +300,7 @@ then
     # appindicator compatibility + manual minimize (xfce can't mimimize as
     # the "insides" of the window are minimized and don't exist but the
     # empty window frame remains behind: so close Skype window after 10 seconds)
-    desktop-file-edit --set-key=Exec --set-value="sh -c 'env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U && sleep 10 && wmctrl -c Skype'" \
+    desktop-file-edit --set-key=Exec --set-value='sh -c "env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U && sleep 10 && wmctrl -c Skype"' \
         /home/$CURR_USER/.config/autostart/skypeforlinux.desktop
 fi
 
@@ -813,27 +813,22 @@ xfce)
     # --------------------------------------------------------------------------
     if [ -x /usr/bin/nemo ];
     then
+        # use nemo for file manager but NOT to draw the desktop
         desktop-file-edit --remove-key=NoDisplay \
             /usr/share/applications/nemo.desktop || true;
 
-        # allow nemo to draw the desktop
-        su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.desktop desktop-layout 'true::false'" || true;
+        # ****BIONIC: don't think necessary (nemo-desktop now handles desktop)
+        # prevent nemo from drawing the desktop
+        # su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.desktop desktop-layout 'true::false'"
 
-        # Ensure Nemo default folder handler
-        sed -i \
-            -e 's@\(inode/directory\)=.*@\1=nemo.desktop@' \
-            -e 's@\(application/x-gnome-saved-search\)=.*@\1=nemo.desktop@' \
-            /etc/gnome/defaults.list \
-            /usr/share/applications/defaults.list || true;
-
-        if ! [ "$(pidof nemo-desktop)" ];
+        # Nemo may be active: kill (will not error if not found)
+        if [ "$(pidof nemo-desktop)" ];
         then
             if [ $DEBUG ];
             then
-                echo "nemo not started: attempting to start" | tee -a $LOGFILE
+                echo "nemo-desktop running (XFCE) and needs killed: $(pidof nemo-desktop)" | tee -a $LOGFILE
             fi
-            # Ensure Nemo Started
-            su "$CURR_USER" -c 'dbus-launch nemo-desktop &' || true;
+            killall nemo-desktop | tee -a $LOGFILE
         fi
     fi
 
@@ -884,7 +879,7 @@ xfce)
     # empty window frame that can't be closed (without re-activating the
     # empty frame by clicking on the panel icon).  Note above skypeforlinux
     # autolaunch will always start it minimized (after 10 second delay)
-    if -e [ /home/$CURR_USER/.config/skypeforlinux/settings.json ]
+    if [ -e /home/$CURR_USER/.config/skypeforlinux/settings.json ];
     then
         # set launchMinimized = false
         sed -i -e 's@"app.launchMinimized":true@"app.launchMinimized":false@' \
@@ -894,54 +889,48 @@ xfce)
     # xfce clock applet loses it's config if opened and closed without first
     #    stopping the xfce4-panel.  So reset to defaults
     # https://askubuntu.com/questions/959339/xfce-panel-clock-disappears
-    XFCE_DEFAULT_PANEL="/etc/xdg/xdg-xfce/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
+    XFCE_DEFAULT_PANEL="/etc/xdg/xdg-xfce/xfce4/panel/default.xml"
     XFCE_PANEL="/home/$CURR_USER/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
-    if ! [ -e $XFCE_PANEL ];
+    if [ -e "$XFCE_PANEL" ];
     then
-        if [ $DEBUG ];
+        # using xmlstarlet since can't be sure of clock plugin #
+        DEFAULT_DIGITAL_FORMAT=$(xmlstarlet sel -T -t -m \
+            '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="digital-format"]/@value' \
+           -v . -n $XFCE_DEFAULT_PANEL)
+        #    DIGITAL_FORMAT=$(xmlstarlet sel -T -t -m \
+        #        '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="digital-format"]/@value' \
+        #        -v . -n $XFCE_PANEL)
+        BLANK_DIGITAL_FORMAT=$(grep '"digital-format" type="string" value=""' $XFCE_PANEL)
+
+        if [ "$BLANK_DIGITAL_FORMAT" ];
         then
-            echo "Creating xfce4-panel.xml for user" | tee -a $LOGFILE
+            if [ $DEBUG ];
+            then
+                echo "xfce4-panel clock digital-format removed: resetting" | tee -a $LOGFILE
+            fi
+            # rik: below doesn't work since when $XFCE_PANEL put in ~/.config the NAMEs
+            # are removed from the plugin properties: don't want to rely on plugin number so
+            # instead will have to hack it with sed
+            #        xmlstarlet ed --inplace -u \
+            #            '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="digital-format"]/@value' \
+            #            -v "$DEFAULT_DIGITAL_FORMAT" $XFCE_PANEL
+            sed -i -e 's@\("digital-format" type="string" value=\)""@\1"'"$DEFAULT_DIGITAL_FORMAT"'"@' \
+                $XFCE_PANEL
         fi
-        mkdir -p $XFCE_SETTINGS/xfconf/xfce-perchannel-xml/
-        cp $XFCE_DEFAULT_PANEL $XFCE_PANEL
-    fi
 
-    # using xmlstarlet since can't be sure of clock plugin #
-    DEFAULT_DIGITAL_FORMAT=$(xmlstarlet sel -T -t -m \
-        '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="digital-format"]/@value' \
-        -v . -n $XFCE_DEFAULT_PANEL)
-    #    DIGITAL_FORMAT=$(xmlstarlet sel -T -t -m \
-    #        '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="digital-format"]/@value' \
-    #        -v . -n $XFCE_PANEL)
-    BLANK_DIGITAL_FORMAT=$(grep '"digital-format" type="string" value=""' $XFCE_PANEL)
+        DEFAULT_TOOLTIP_FORMAT=$(xmlstarlet sel -T -t -m \
+            '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="tooltip-format"]/@value' \
+            -v . -n $XFCE_DEFAULT_PANEL)
+        BLANK_TOOLTIP_FORMAT=$(grep '"tooltip-format" type="string" value=""' $XFCE_PANEL)
 
-    if [ "$BLANK_DIGITAL_FORMAT" ];
-    then
-        if [ $DEBUG ];
+        if [ "$BLANK_TOOLTIP_FORMAT" ];
         then
-            echo "xfce4-panel clock digital-format removed: resetting" | tee -a $LOGFILE
+            if [ $DEBUG ];
+            then
+                echo "xfce4-panel clock tooltip-format removed: resetting" | tee -a $LOGFILE
+            fi
+            sed -i -e 's@\("tooltip-format" type="string" value=\)""@\1"'"$DEFAULT_TOOLTIP_FORMAT"'"@' $XFCE_PANEL
         fi
-        # rik: below doesn't work since when $XFCE_PANEL put in ~/.config the NAMEs
-        # are removed from the plugin properties: don't want to rely on plugin number so
-        # instead will have to hack it with sed
-        #        xmlstarlet ed --inplace -u \
-        #            '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="digital-format"]/@value' \
-        #            -v "$DEFAULT_DIGITAL_FORMAT" $XFCE_PANEL
-        sed -i -e 's@\("digital-format" type="string" value=\)""@\1"'"$DEFAULT_DIGITAL_FORMAT"'"@' $XFCE_PANEL
-    fi
-
-    DEFAULT_TOOLTIP_FORMAT=$(xmlstarlet sel -T -t -m \
-        '//channel[@name="xfce4-panel"]/property[@name="plugins"]/property[@value="clock"]/property[@name="tooltip-format"]/@value' \
-        -v . -n $XFCE_DEFAULT_PANEL)
-    BLANK_TOOLTIP_FORMAT=$(grep '"tooltip-format" type="string" value=""' $XFCE_PANEL)
-
-    if [ "$BLANK_TOOLTIP_FORMAT" ];
-    then
-        if [ $DEBUG ];
-        then
-            echo "xfce4-panel clock tooltip-format removed: resetting" | tee -a $LOGFILE
-        fi
-        sed -i -e 's@\("tooltip-format" type="string" value=\)""@\1"'"$DEFAULT_TOOLTIP_FORMAT"'"@' $XFCE_PANEL
     fi
 ;;
 

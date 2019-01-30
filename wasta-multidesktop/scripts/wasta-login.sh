@@ -63,6 +63,8 @@
 #       https://askubuntu.com/questions/959339/xfce-panel-clock-disappears)
 #   2019-01-23 rik: only killing dconf-service and dbus-daemon that were *not*
 #       running before wasta-login.sh started.
+#   2019-01-30 rik: if skypeforlinux set to autostart, set session to 'Unity'
+#       for appindicator compatibility
 #
 # ==============================================================================
 
@@ -286,6 +288,18 @@ if ! [ -e /home/$CURR_USER/.config/zim/preferences.conf ];
 then
     su "$CURR_USER" -c "cp -r $DIR/resources/skel/.config/zim \
         /home/$CURR_USER/.config/zim"
+fi
+
+# skypeforlinux: if autostart exists patch it to launch as indicator
+#   (this fixes icon size in xfce and fixes menu options for all desktops)
+#   (needs to be run every time because skypeforlinux re-writes this launcher
+#    every time it is started)
+#   https://askubuntu.com/questions/1033599/how-to-remove-skypes-double-icon-in-ubuntu-18-04-mate-tray
+if [ -e /home/$CURR_USER/.config/autostart/skypeforlinux.desktop ];
+then
+    # appindicator compatibility
+    desktop-file-edit --set-key=Exec --set-value="env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U" \
+        /home/$CURR_USER/.config/autostart/skypeforlinux.desktop
 fi
 
 # --------------------------------------------------------------------------

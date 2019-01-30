@@ -62,6 +62,8 @@
 #     issues with ibus user settings getting corrupted.
 #   - adding items to XFCE Settings Manager
 # 2019-01-23 rik: hiding texdoctk (installed by Paratext)
+# 2019-01-30 rik: skypeforlinux - appindicator compatiblity by setting desktop
+#   to "Unity"
 #
 # ==============================================================================
 
@@ -793,6 +795,16 @@ then
 
     desktop-file-edit --add-category=X-XFCE-HardwareSettings \
         /usr/share/applications/pavucontrol.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# skypeforlinux
+# ------------------------------------------------------------------------------
+# appindicator compatibility
+if [ -e /usr/share/applications/skypeforlinux.desktop ];
+then
+    desktop-file-edit --set-key=Exec --set-value="env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U" \
+        /usr/share/applications/skypeforlinux.desktop
 fi
 
 # ------------------------------------------------------------------------------

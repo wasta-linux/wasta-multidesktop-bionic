@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.9) bionic; urgency=medium
+
+  * wasta-login, app-adjustments: skypeforlinux appindicator compatibility
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 30 Jan 2019 12:01:40 +0300
+
 wasta-multidesktop-bionic (1.2.8) bionic; urgency=medium
 
   * wasta-login.sh: "smart" kill of dconf-service and dbus-daemon

@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.15) bionic; urgency=medium
+
+  * wasta-login: correct value for desktop-icons/style
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 06 Feb 2019 17:29:59 +0300
+
 wasta-multidesktop-bionic (1.2.14) bionic; urgency=medium
 
   * wasta-login: create/update xfce4-desktop/desktop-icons/style

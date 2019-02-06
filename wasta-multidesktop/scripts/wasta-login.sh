@@ -995,7 +995,7 @@ xfce)
         # update key
         xmlstarlet ed --inplace \
             -u '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]/@value' \
-            -v "2" $XFCE_DESKTOP
+            -v "0" $XFCE_DESKTOP
     fi
 
     # skypeforlinux: can't start minimized in xfce or will end up with an

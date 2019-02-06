@@ -69,6 +69,8 @@
 #       handled now by nemo-desktop (XFCE added to nemo-autostart by
 #       app-adjustments.sh
 #       - make sure gnome items set to not display in xfce
+#       - create/update xfce4-desktop/desktop-icons/style element to not show
+#       desktop icons
 #
 # ==============================================================================
 
@@ -496,7 +498,7 @@ cinnamon)
 #            # Ensure Nemo Started
 #            su "$CURR_USER" -c 'dbus-launch nemo-desktop &' || true;
 #        fi
-#    fi
+    fi
 
     if [ -e /usr/share/applications/nemo-compare-preferences.desktop ];
     then
@@ -963,10 +965,38 @@ xfce)
 
     # xfdesktop used for background but does NOT draw desktop icons
     # (app-adjustments adds XFCE to OnlyShowIn to trigger nemo-desktop)
-    # NOTE: XFCE_DESKTOP created above in background sync
-    xmlstarlet ed --inplace -u \
+    # NOTE: XFCE_DESKTOP file created above in background sync
+
+    # first: determine if element exists
+    DESKTOP_STYLE=""
+    DESKTOP_STYLE=$(xmlstarlet sel -T -t -m \
         '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]/@value' \
-        -v 2 $XFCE_DESKTOP
+        -v . -n $XFCE_DESKTOP)
+
+    # second: create element else update element
+    if [ "$DESKTOP_STYLE" == "" ];
+    then
+        # create key
+        if [ $DEBUG ];
+        then
+            echo "creating xfce4-desktop/desktop-icons/style element" | tee -a $LOGFILE
+        fi
+        xmlstarlet ed --inplace \
+            -s '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]' \
+                -t elem -n "property" -v "" \
+            -i '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[last()]' \
+                -t attr -n "name" -v "style" \
+            -i '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]' \
+                -t attr -n "type" -v "int" \
+            -i '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]' \
+                -t attr -n "value" -v "2" \
+            $XFCE_DESKTOP
+    else
+        # update key
+        xmlstarlet ed --inplace \
+            -u '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]/@value' \
+            -v "2" $XFCE_DESKTOP
+    fi
 
     # skypeforlinux: can't start minimized in xfce or will end up with an
     # empty window frame that can't be closed (without re-activating the

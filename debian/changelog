@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.2.14) bionic; urgency=medium
+
+  * wasta-login: create/update xfce4-desktop/desktop-icons/style
+    element to disable desktop icons
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 06 Feb 2019 15:41:40 +0300
+
 wasta-multidesktop-bionic (1.2.13) bionic; urgency=medium
 
   * wasta-login: xfce disable desktop icons (nemo-desktop handles these)

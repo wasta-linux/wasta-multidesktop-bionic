@@ -64,7 +64,8 @@
 # 2019-01-23 rik: hiding texdoctk (installed by Paratext)
 # 2019-01-30 rik: skypeforlinux - appindicator compatiblity by setting desktop
 #   to "Unity"
-# 2019-02-06 rik: autostart nemo if wasta-xfce found
+# 2019-02-06 rik: if wasta-xfce found add XFCE to nemo-autostart
+#   - gnome-online-accounts: add to xfce settings (prefer cinnamon over gnome)
 #
 # ==============================================================================
 
@@ -519,6 +520,48 @@ then
 
     desktop-file-edit --add-category=X-XFCE-PersonalSettings \
         /usr/share/applications/gnome-language-selector.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# gnome-online-accounts
+# ------------------------------------------------------------------------------
+# add to XFCE Settings Manager
+
+if [ -e /usr/share/applications/cinnamon-online-accounts-panel.desktop ];
+then
+    # prefer cinnamon online dialog if available
+    desktop-file-edit --add-only-show-in=XFCE \
+        /usr/share/applications/cinnamon-online-accounts-panel.desktop
+
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/cinnamon-online-accounts-panel.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/cinnamon-online-accounts-panel.desktop
+
+    desktop-file-edit --add-category=X-XFCE-PersonalSettings \
+        /usr/share/applications/cinnamon-online-accounts-panel.desktop
+
+    # make sure gnome-online-accounts-panel is not showing since use cinnamon
+    if [ -e /usr/share/applications/gnome-online-accounts-panel.desktop ];
+    then
+        desktop-file-edit --remove-only-show-in=XFCE \
+            /usr/share/applications/gnome-online-accounts-panel.desktop
+    fi
+elif [ -e /usr/share/applications/gnome-online-accounts-panel.desktop ];
+then
+    # cinnamon online accounts not available so use gnome instead
+    desktop-file-edit --add-only-show-in=XFCE \
+        /usr/share/applications/gnome-online-accounts-panel.desktop
+
+    desktop-file-edit --add-category=Settings \
+        /usr/share/applications/gnome-online-accounts-panel.desktop
+
+    desktop-file-edit --add-category=X-XFCE-SettingsDialog \
+        /usr/share/applications/gnome-online-accounts-panel.desktop
+
+    desktop-file-edit --add-category=X-XFCE-PersonalSettings \
+        /usr/share/applications/gnome-online-accounts-panel.desktop
 fi
 
 # ------------------------------------------------------------------------------

@@ -762,7 +762,8 @@ fi
 # ------------------------------------------------------------------------------
 # Installed by gnome-system-tools (for XFCE) but don't need this one, even
 #   though has one nice feature allowing user to change system name with a GUI
-if [ -e /usr/share/applications/users.desktop ];
+# But too many "Network" items in Main Menu leads to confusion
+if [ -e /usr/share/applications/network.desktop ];
 then
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/network.desktop || true;
@@ -1058,6 +1059,9 @@ fi
 # add to XFCE Settings Manager
 if [ -e /usr/share/applications/users.desktop ];
 then
+    desktop-file-edit --remove-key=NoDisplay \
+        /usr/share/applications/users.desktop
+
     desktop-file-edit --add-only-show-in=XFCE \
         /usr/share/applications/users.desktop
 

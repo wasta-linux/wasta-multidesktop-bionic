@@ -820,6 +820,9 @@ xfce)
         # allow nemo to draw the desktop
         su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.desktop desktop-layout 'true::false'" || true;
 
+        # allow nemo to draw the desktop
+        su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.desktop ignored-desktop-handlers \"['conky', 'xfdesktop']\"" || true;
+
         # Ensure Nemo default folder handler
         sed -i \
             -e 's@\(inode/directory\)=.*@\1=nemo.desktop@' \
@@ -989,7 +992,7 @@ xfce)
             -i '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]' \
                 -t attr -n "type" -v "int" \
             -i '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]' \
-                -t attr -n "value" -v "2" \
+                -t attr -n "value" -v "0" \
             $XFCE_DESKTOP
     else
         # update key
@@ -1097,9 +1100,9 @@ then
     then
         if [ "$(pidof nemo-desktop)" ];
         then
-            echo "END: nemo IS running!" | tee -a $LOGFILE
+            echo "END: nemo-desktop IS running!" | tee -a $LOGFILE
         else
-            echo "END: nemo NOT running!" | tee -a $LOGFILE
+            echo "END: nemo-desktop NOT running!" | tee -a $LOGFILE
         fi
     fi
 

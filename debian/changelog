@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.2.13) bionic; urgency=medium
+
+  * wasta-login: xfce disable desktop icons (nemo-desktop handles these)
+    - in xfce disable some gnome items
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Wed, 06 Feb 2019 12:13:24 +0300
+
 wasta-multidesktop-bionic (1.2.12) bionic; urgency=medium
 
   * minor cleanup to wasta-login from previous changes

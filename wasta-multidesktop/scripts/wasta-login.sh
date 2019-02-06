@@ -65,6 +65,10 @@
 #       running before wasta-login.sh started.
 #   2019-01-30 rik: if skypeforlinux set to autostart, set session to 'Unity'
 #       for appindicator compatibility
+#   2019-02-06 rik: xfce session - don't have xfce show desktop icons since
+#       handled now by nemo-desktop (XFCE added to nemo-autostart by
+#       app-adjustments.sh
+#       - make sure gnome items set to not display in xfce
 #
 # ==============================================================================
 
@@ -305,10 +309,8 @@ then
 fi
 
 # --------------------------------------------------------------------------
-# SYNC to PREV_SESSION if different
+# SYNC to PREV_SESSION (mainly for background picture)
 # --------------------------------------------------------------------------
-# previously I only triggered if current and prev sessions were different
-# but I will always apply the changes in case it didn't succeed before.
 case "$PREV_SESSION" in
 
 cinnamon)
@@ -429,7 +431,7 @@ xfce)
 esac
 
 # ------------------------------------------------------------------------------
-# Processing based on session
+# Processing based on current session
 # ------------------------------------------------------------------------------
 case "$CURR_SESSION" in
 cinnamon)
@@ -483,16 +485,18 @@ cinnamon)
             /etc/gnome/defaults.list \
             /usr/share/applications/defaults.list || true;
 
-        if ! [ "$(pidof nemo-desktop)" ];
-        then
-            if [ $DEBUG ];
-            then
-                echo "nemo not started: attempting to start" | tee -a $LOGFILE
-            fi
-            # Ensure Nemo Started
-            su "$CURR_USER" -c 'dbus-launch nemo-desktop &' || true;
-        fi
-    fi
+# 2019-02-06 rik: not necessary since /usr/share/applications/nemo-autostart.desktop triggers nemo-desktop?
+#
+#        if ! [ "$(pidof nemo-desktop)" ];
+#        then
+#            if [ $DEBUG ];
+#            then
+#                echo "nemo not started: attempting to start" | tee -a $LOGFILE
+#            fi
+#            # Ensure Nemo Started
+#            su "$CURR_USER" -c 'dbus-launch nemo-desktop &' || true;
+#        fi
+#    fi
 
     if [ -e /usr/share/applications/nemo-compare-preferences.desktop ];
     then
@@ -585,12 +589,6 @@ cinnamon)
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/nautilus-compare-preferences.desktop || true;
-    fi
-
-    if [ -e /usr/share/applications/software-properties-gnome.desktop ];
-    then
-        desktop-file-edit --set-key=NoDisplay --set-value=true \
-            /usr/share/applications/software-properties-gnome.desktop || true;
     fi
 
     # ENABLE notify-osd
@@ -813,23 +811,33 @@ xfce)
     # --------------------------------------------------------------------------
     if [ -x /usr/bin/nemo ];
     then
-        # use nemo for file manager but NOT to draw the desktop
+        # nemo default file manager AND draws desktop (icons) for wasta-xfce
         desktop-file-edit --remove-key=NoDisplay \
             /usr/share/applications/nemo.desktop || true;
+
+        # allow nemo to draw the desktop
+        su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.desktop desktop-layout 'true::false'" || true;
+
+        # Ensure Nemo default folder handler
+        sed -i \
+            -e 's@\(inode/directory\)=.*@\1=nemo.desktop@' \
+            -e 's@\(application/x-gnome-saved-search\)=.*@\1=nemo.desktop@' \
+            /etc/gnome/defaults.list \
+            /usr/share/applications/defaults.list || true;
 
         # ****BIONIC: don't think necessary (nemo-desktop now handles desktop)
         # prevent nemo from drawing the desktop
         # su "$CURR_USER" -c "dbus-launch gsettings set org.nemo.desktop desktop-layout 'true::false'"
 
         # Nemo may be active: kill (will not error if not found)
-        if [ "$(pidof nemo-desktop)" ];
-        then
-            if [ $DEBUG ];
-            then
-                echo "nemo-desktop running (XFCE) and needs killed: $(pidof nemo-desktop)" | tee -a $LOGFILE
-            fi
-            killall nemo-desktop | tee -a $LOGFILE
-        fi
+        #if [ "$(pidof nemo-desktop)" ];
+        #then
+        #    if [ $DEBUG ];
+        #    then
+        #        echo "nemo-desktop running (XFCE) and needs killed: $(pidof nemo-desktop)" | tee -a $LOGFILE
+        #    fi
+        #    killall nemo-desktop | tee -a $LOGFILE
+        #fi
     fi
 
     if [ -e /usr/share/applications/nemo-compare-preferences.desktop ];
@@ -851,14 +859,79 @@ xfce)
     # --------------------------------------------------------------------------
     # Ubuntu/GNOME Settings
     # --------------------------------------------------------------------------
-    # Nautilus may be active: kill (will not error if not found)
-    if [ "$(pidof nautilus-desktop)" ];
+
+    # HIDE Ubuntu/GNOME items
+    if [ -e /usr/share/applications/alacarte.desktop ];
     then
-        if [ $DEBUG ];
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/alacarte.desktop || true;
+    fi
+
+    # Blueman-applet may be active: kill (will not error if not found)
+    if [ "$(pgrep blueman-applet)" ];
+    then
+        killall blueman-applet | tee -a $LOGFILE
+    fi
+
+    if [ -e /usr/share/applications/blueman-manager.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/blueman-manager.desktop || true;
+    fi
+
+    if [ -e /usr/share/applications/gnome-online-accounts-panel.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/gnome-online-accounts-panel.desktop || true;
+    fi
+
+    # Gnome Startup Applications
+    if [ -e /usr/share/applications/gnome-session-properties.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/gnome-session-properties.desktop || true;
+    fi
+
+    if [ -e /usr/share/applications/gnome-tweak-tool.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/gnome-tweak-tool.desktop || true;
+    fi
+
+    if [ -e /usr/share/applications/nautilus.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/nautilus.desktop || true;
+
+        # Nautilus may be active: kill (will not error if not found)
+        if [ "$(pidof nautilus-desktop)" ];
         then
-            echo "nautilus running (TOP) and needs killed: $(pidof nautilus-desktop)" | tee -a $LOGFILE
+            if [ $DEBUG ];
+            then
+                echo "nautilus running (MID) and needs killed: $(pidof nautilus-desktop)" | tee -a $LOGFILE
+            fi
+            killall nautilus-desktop | tee -a $LOGFILE
         fi
-        killall nautilus-desktop | tee -a $LOGFILE
+
+        # Prevent Nautilus from drawing the desktop
+        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
+        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
+    fi
+
+    if [ -e /usr/share/applications/org.gnome.Nautilus.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/org.gnome.Nautilus.desktop || true;
+
+        # Prevent Nautilus from drawing the desktop
+        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
+        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
+    fi
+
+    if [ -e /usr/share/applications/nautilus-compare-preferences.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/nautilus-compare-preferences.desktop || true;
     fi
 
     # DISABLE notify-osd (xfce uses xfce4-notifyd)
@@ -874,6 +947,26 @@ xfce)
     # --------------------------------------------------------------------------
     # XFCE Settings
     # --------------------------------------------------------------------------
+
+    # Thunar: hide (only installed for bulk-rename-tool)
+    if [ -e /usr/share/applications/Thunar.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/Thunar.desktop || true;
+    fi
+
+    if [ -e /usr/share/applications/thunar-settings.desktop ];
+    then
+        desktop-file-edit --set-key=NoDisplay --set-value=true \
+            /usr/share/applications/thunar-settings.desktop || true;
+    fi
+
+    # xfdesktop used for background but does NOT draw desktop icons
+    # (app-adjustments adds XFCE to OnlyShowIn to trigger nemo-desktop)
+    # NOTE: XFCE_DESKTOP created above in background sync
+    xmlstarlet ed --inplace -u \
+        '//channel[@name="xfce4-desktop"]/property[@name="desktop-icons"]/property[@name="style"]/@value' \
+        -v 2 $XFCE_DESKTOP
 
     # skypeforlinux: can't start minimized in xfce or will end up with an
     # empty window frame that can't be closed (without re-activating the

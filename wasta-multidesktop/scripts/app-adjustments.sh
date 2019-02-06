@@ -64,6 +64,7 @@
 # 2019-01-23 rik: hiding texdoctk (installed by Paratext)
 # 2019-01-30 rik: skypeforlinux - appindicator compatiblity by setting desktop
 #   to "Unity"
+# 2019-02-06 rik: autostart nemo if wasta-xfce found
 #
 # ==============================================================================
 
@@ -73,11 +74,11 @@
 #   No fancy "double click" here because normal user should never need to run
 if [ $(id -u) -ne 0 ]
 then
-	echo
-	echo "You must run this script with sudo." >&2
-	echo "Exiting...."
-	sleep 5s
-	exit 1
+    echo
+    echo "You must run this script with sudo." >&2
+    echo "Exiting...."
+    sleep 5s
+    exit 1
 fi
 
 # ------------------------------------------------------------------------------
@@ -691,9 +692,7 @@ fi
 # ------------------------------------------------------------------------------
 if [ -x /usr/bin/nemo ];
 then
-    # --------------------------------------------------------------------------
     # Allow nemo as a helper for evince
-    # --------------------------------------------------------------------------
     if [ -x /usr/bin/evince ];
     then
         # delete 'wasta' lines (will re-create below)
@@ -701,6 +700,17 @@ then
 
         sed -i -e 's@\(/usr/bin/nautilus Cx -> sanitized_helper.*\)@\1\n  /usr/bin/nemo Cx -> sanitized_helper,     # wasta: Cinnamon/Nemo@' \
             /etc/apparmor.d/usr.bin.evince
+    fi
+
+    if [ -e /usr/share/wasta-xfce ];
+    then
+        # only for wasta-xfce allow XFCE to trigger nemo-autostart
+        desktop-file-edit --add-only-show-in=XFCE \
+            /usr/share/applications/nemo-autostart.desktop
+    else
+        # if no wasta-xfce don't allow XFCE to trigger nemo-autostart
+        desktop-file-edit --remove-only-show-in=XFCE \
+            /usr/share/applications/nemo-autostart.desktop
     fi
 fi
 

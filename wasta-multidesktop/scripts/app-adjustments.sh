@@ -803,8 +803,8 @@ fi
 # appindicator compatibility
 if [ -e /usr/share/applications/skypeforlinux.desktop ];
 then
-    desktop-file-edit --set-key=Exec --set-value="sh -c 'env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U'" \
-        /usr/share/applications/skypeforlinux.desktop
+    desktop-file-edit --set-key=Exec --set-value='sh -c "env XDG_CURRENT_DESKTOP=Unity /usr/bin/skypeforlinux %U"' \
+        /usr/share/applications/skypeforlinux.desktop> /dev/null 2>&1 || true;
 fi
 
 # ------------------------------------------------------------------------------
@@ -832,7 +832,7 @@ fi
 # Disable csd
 if [ -e /usr/share/applications/simple-scan.desktop ];
 then
-    desktop-file-edit --set-key=Exec --set-value="env XDG_CURRENT_DESKTOP=Unity simple-scan" \
+    desktop-file-edit --set-key=Exec --set-value='sh -c "env XDG_CURRENT_DESKTOP=Unity simple-scan"' \
         /usr/share/applications/simple-scan.desktop > /dev/null 2>&1 || true;
 fi
 

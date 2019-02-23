@@ -66,6 +66,7 @@
 #   to "Unity"
 # 2019-02-06 rik: if wasta-xfce found add XFCE to nemo-autostart
 #   - gnome-online-accounts: add to xfce settings (prefer cinnamon over gnome)
+# 2019-02-23 rik: cinnamon applet updates for cinnamon 4.0
 #
 # ==============================================================================
 
@@ -317,10 +318,25 @@ then
     # - use-custom-format: custom panel clock format
     # - custom-format: set to "%l:%M %p"
     # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
-    #     update ownership (in case run as root)
     NEW_FILE=$(jq '.["use-custom-format"].default=true | .["custom-format"].default="%l:%M %p"' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE
+
+    # Cinnamon 4.0+
+    # applet: grouped-window-list@cinnamon.org
+    JSON_FILE=/usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/settings-schema.json
+    if [ -e "$JSON_FILE" ];
+    then
+        echo
+        echo "*** Updating JSON_FILE: $JSON_FILE"
+        echo
+        # updates:
+        # - set default launchers
+        # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
+        NEW_FILE=$(jq '.["pinned-apps"].default=["firefox.desktop", "nemo.desktop", "libreoffice-writer.desktop", "wasta-backup.desktop", "wasta-resources.desktop"]' \
+            < $JSON_FILE)
+        echo "$NEW_FILE" > $JSON_FILE
+    fi
 
     # applet: menu@cinnamon.org
     JSON_FILE=/usr/share/cinnamon/applets/menu@cinnamon.org/settings-schema.json
@@ -330,10 +346,27 @@ then
     # updates:
     # - don't show category icons
     # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
-    # update ownership (in case run as root)
     NEW_FILE=$(jq '.["show-category-icons"].default=false' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE
+
+    # Cinnamon 4.0+
+    # applet: menu@cinnamon.org
+    JSON_FILE=/usr/share/cinnamon/applets/menu@cinnamon.org/settings-schema.json
+    FAVBOX_MIN=$(grep 'favbox-min-height' $JSON_FILE 2>&1 || true;)
+    if [ "$FAVEBOX_MIN" ];
+    then
+        echo
+        echo "*** Updating JSON_FILE: $JSON_FILE"
+        echo
+        # updates:
+        # - set favbox min height to 50 (lowest allowed)
+        # - don't show category icons
+        # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
+        NEW_FILE=$(jq '.["favbox-min-height"].default=50 | .["show-category-icons"].default=false' \
+            < $JSON_FILE)
+        echo "$NEW_FILE" > $JSON_FILE
+    fi
 
     # applet: panel-launchers@cinnamon.org
     JSON_FILE=/usr/share/cinnamon/applets/panel-launchers@cinnamon.org/settings-schema.json
@@ -343,7 +376,6 @@ then
     # updates:
     # - set default launchers
     # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
-    # update ownership (in case run as root)
     NEW_FILE=$(jq '.["launcherList"].default=["firefox.desktop", "nemo.desktop", "libreoffice-writer.desktop", "wasta-backup.desktop", "wasta-resources.desktop"]' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE

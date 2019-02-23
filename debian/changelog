@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.16) bionic; urgency=medium
+
+  * app-adjustments.sh: update applet tweaks for cinnamon 4.0
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sat, 23 Feb 2019 14:22:01 +0300
+
 wasta-multidesktop-bionic (1.2.15) bionic; urgency=medium
 
   * wasta-login: correct value for desktop-icons/style

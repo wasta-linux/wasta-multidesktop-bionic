@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.17) bionic; urgency=medium
+
+  * app-adjustments.sh: minor updates for menu@cinnamon.org
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sun, 24 Feb 2019 14:34:25 +0300
+
 wasta-multidesktop-bionic (1.2.16) bionic; urgency=medium
 
   * app-adjustments.sh: update applet tweaks for cinnamon 4.0

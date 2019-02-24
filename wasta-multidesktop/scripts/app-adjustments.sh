@@ -317,7 +317,7 @@ then
     # updates:
     # - use-custom-format: custom panel clock format
     # - custom-format: set to "%l:%M %p"
-    # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
+    # - note: jq can't do "sed -i" inplace update, so need to re-create file
     NEW_FILE=$(jq '.["use-custom-format"].default=true | .["custom-format"].default="%l:%M %p"' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE
@@ -332,7 +332,7 @@ then
         echo
         # updates:
         # - set default launchers
-        # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
+        # - note: jq can't do "sed -i" inplace update, so need to re-create file
         NEW_FILE=$(jq '.["pinned-apps"].default=["firefox.desktop", "nemo.desktop", "libreoffice-writer.desktop", "wasta-backup.desktop", "wasta-resources.desktop"]' \
             < $JSON_FILE)
         echo "$NEW_FILE" > $JSON_FILE
@@ -344,9 +344,11 @@ then
     echo "*** Updating JSON_FILE: $JSON_FILE"
     echo
     # updates:
-    # - don't show category icons
-    # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
-    NEW_FILE=$(jq '.["show-category-icons"].default=false' \
+    # - search-filesystem: true (from search bar)
+    # - show-category-icons: false
+    # - show-places: false
+    # - note: jq can't do "sed -i" inplace update, so need to re-create file
+    NEW_FILE=$(jq '.["search-filesystem"].default=true | .["show-category-icons"].default=false | .["show-places"].default=false' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE
 
@@ -360,10 +362,12 @@ then
         echo "*** Updating JSON_FILE: $JSON_FILE"
         echo
         # updates:
-        # - set favbox min height to 50 (lowest allowed)
-        # - don't show category icons
-        # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
-        NEW_FILE=$(jq '.["favbox-min-height"].default=50 | .["show-category-icons"].default=false' \
+        # - favbox-min-height: 50 (lowest allowed)
+        # - search-filesystem: true (from search bar)
+        # - show-category-icons: false
+        # - show-places: false
+        # - note: jq can't do "sed -i" inplace update, so need to re-create file
+        NEW_FILE=$(jq '.["favbox-min-height"].default=50 | .["search-filesystem"].default=true | .["show-category-icons"].default=false | .["show-places"].default=false' \
             < $JSON_FILE)
         echo "$NEW_FILE" > $JSON_FILE
     fi
@@ -375,7 +379,7 @@ then
     echo
     # updates:
     # - set default launchers
-    # - note: jq can't do "sed -i" inplace update, so need to re-create file, then
+    # - note: jq can't do "sed -i" inplace update, so need to re-create file
     NEW_FILE=$(jq '.["launcherList"].default=["firefox.desktop", "nemo.desktop", "libreoffice-writer.desktop", "wasta-backup.desktop", "wasta-resources.desktop"]' \
         < $JSON_FILE)
     echo "$NEW_FILE" > $JSON_FILE

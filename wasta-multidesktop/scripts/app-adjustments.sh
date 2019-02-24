@@ -332,8 +332,9 @@ then
         echo
         # updates:
         # - set default launchers
+        # - icon-spacing: 10
         # - note: jq can't do "sed -i" inplace update, so need to re-create file
-        NEW_FILE=$(jq '.["pinned-apps"].default=["firefox.desktop", "nemo.desktop", "libreoffice-writer.desktop", "wasta-backup.desktop", "wasta-resources.desktop"]' \
+        NEW_FILE=$(jq '.["pinned-apps"].default=["firefox.desktop", "nemo.desktop", "libreoffice-writer.desktop", "wasta-backup.desktop", "wasta-resources.desktop"] | .["icon-spacing"].default=10' \
             < $JSON_FILE)
         echo "$NEW_FILE" > $JSON_FILE
     fi
@@ -356,7 +357,7 @@ then
     # applet: menu@cinnamon.org
     JSON_FILE=/usr/share/cinnamon/applets/menu@cinnamon.org/settings-schema.json
     FAVBOX_MIN=$(grep 'favbox-min-height' $JSON_FILE 2>&1 || true;)
-    if [ "$FAVEBOX_MIN" ];
+    if [ "$FAVBOX_MIN" ];
     then
         echo
         echo "*** Updating JSON_FILE: $JSON_FILE"

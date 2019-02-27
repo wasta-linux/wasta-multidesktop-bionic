@@ -363,6 +363,7 @@ then
         echo "*** Updating JSON_FILE: $JSON_FILE"
         echo
         # updates:
+        # *** NOTE: only updates for ALL wasta-layout-system options, otherwise set there.
         # - favbox-min-height: 50 (lowest allowed)
         # - search-filesystem: true (from search bar)
         # - show-category-icons: false

@@ -1091,6 +1091,20 @@ then
         /usr/share/applications/update-manager.desktop
 fi
 
+# disable release-upgrade prompts (originally in wasta-core but needing to
+#   ensure users NEVER faced with upgrade prompt)
+
+# can't be put in /etc/update-manager/release-upgrades.d/ since not respected:
+#   https://askubuntu.com/questions/611837/why-does-software-updates-affects-do-release-upgrade-command-in-terminal#612226
+if [ -e /etc/update-manager/release-upgrades ];
+then
+    sed -i -e 's@Prompt=.*@Prompt=never@' /etc/update-manager/release-upgrades
+else
+    cat << EOF > /etc/update-manager/release-upgrades
+Prompt=never
+EOF
+fi
+
 # ------------------------------------------------------------------------------
 # users (from gnome-system-tools)
 # ------------------------------------------------------------------------------

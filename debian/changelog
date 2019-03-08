@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.18) bionic; urgency=medium
+
+  * app-adjustments.sh: disable release-upgrade prompt
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Fri, 08 Mar 2019 15:18:36 +0300
+
 wasta-multidesktop-bionic (1.2.17) bionic; urgency=medium
 
   * app-adjustments.sh: minor updates for menu@cinnamon.org

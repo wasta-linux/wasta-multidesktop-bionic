@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.20) bionic; urgency=medium
+
+  * app-adjustments: sending xfce4-terminal warnings to /dev/null
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sat, 16 Mar 2019 18:13:11 +0300
+
 wasta-multidesktop-bionic (1.2.19) bionic; urgency=medium
 
   * app-adjustments: settings for xfce4-terminal

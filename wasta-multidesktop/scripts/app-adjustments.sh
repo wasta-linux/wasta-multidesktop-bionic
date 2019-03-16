@@ -1280,8 +1280,9 @@ fi
 # only show in xfce
 if [ -e /usr/share/applications/xfce4-terminal.desktop ];
 then
+    # sending output to /dev/null because desktop file has warnings
     desktop-file-edit --add-only-show-in=XFCE \
-        /usr/share/applications/xfce4-terminal.desktop
+        /usr/share/applications/xfce4-terminal.desktop >/dev/null 2>&1 || true;
 fi
 
 # ------------------------------------------------------------------------------
@@ -1290,8 +1291,9 @@ fi
 # hide from all desktops even from xfce (can be opened from xfce4-terminal)
 if [ -e /usr/share/applications/xfce4-terminal-settings.desktop ];
 then
+    # sending output to /dev/null because desktop file has warnings
     desktop-file-edit --set-key=NoDisplay --set-value=true \
-        /usr/share/applications/xfce4-terminal-settings.desktop
+        /usr/share/applications/xfce4-terminal-settings.desktop >/dev/null 2>&1 || true;
 fi
 
 # ------------------------------------------------------------------------------

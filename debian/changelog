@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.2.19) bionic; urgency=medium
+
+  * app-adjustments: settings for xfce4-terminal
+  * install-files/lightdm.conf.d: set slick-greeter as default greeter-session
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sat, 16 Mar 2019 16:55:44 +0300
+
 wasta-multidesktop-bionic (1.2.18) bionic; urgency=medium
 
   * app-adjustments.sh: disable release-upgrade prompt

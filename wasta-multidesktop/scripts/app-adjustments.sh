@@ -67,6 +67,7 @@
 # 2019-02-06 rik: if wasta-xfce found add XFCE to nemo-autostart
 #   - gnome-online-accounts: add to xfce settings (prefer cinnamon over gnome)
 # 2019-02-23 rik: cinnamon applet updates for cinnamon 4.0
+# 2019-03-16 rik: xfce4-terminal: only show in XFCE, hide preferences app
 #
 # ==============================================================================
 
@@ -1271,6 +1272,26 @@ if [ -e /usr/share/applications/xfce4-screenshooter.desktop ];
 then
     desktop-file-edit --set-key=NoDisplay --set-value=true \
         /usr/share/applications/xfce4-screenshooter.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# xfce4-terminal
+# ------------------------------------------------------------------------------
+# only show in xfce
+if [ -e /usr/share/applications/xfce4-terminal.desktop ];
+then
+    desktop-file-edit --add-only-show-in=XFCE \
+        /usr/share/applications/xfce4-terminal.desktop
+fi
+
+# ------------------------------------------------------------------------------
+# xfce4-terminal-settings
+# ------------------------------------------------------------------------------
+# hide from all desktops even from xfce (can be opened from xfce4-terminal)
+if [ -e /usr/share/applications/xfce4-terminal-settings.desktop ];
+then
+    desktop-file-edit --set-key=NoDisplay --set-value=true \
+        /usr/share/applications/xfce4-terminal-settings.desktop
 fi
 
 # ------------------------------------------------------------------------------

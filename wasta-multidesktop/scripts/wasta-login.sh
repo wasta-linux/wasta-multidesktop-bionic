@@ -71,6 +71,8 @@
 #       - make sure gnome items set to not display in xfce
 #       - create/update xfce4-desktop/desktop-icons/style element to not show
 #       desktop icons
+#   2019-03-17 rik: add xubuntu to xfce session check
+#       - ensure gnome NOT drawing desktop even if Nautilus not installed
 #
 # ==============================================================================
 
@@ -395,7 +397,7 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
     fi
 ;;
 
-xfce)
+xfce|xubuntu)
     # apply XFCE settings to other DEs
     #XFCE_BG_URL=$(urlencode $XFCE_BG)
 
@@ -799,7 +801,7 @@ ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
     fi
 ;;
 
-xfce)
+xfce|xubuntu)
     # ==========================================================================
     # ACTIVE SESSION: XFCE
     # ==========================================================================

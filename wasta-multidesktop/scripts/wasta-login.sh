@@ -92,6 +92,7 @@ LOGFILE=/var/log/wasta-multidesktop/wasta-login.txt
 PREV_SESSION_FILE=/var/log/wasta-multidesktop/$CURR_USER-prev-session
 PREV_SESSION=$(cat $PREV_SESSION_FILE)
 DEBUG_FILE=/var/log/wasta-multidesktop/wasta-login-debug
+
 PID_DCONF=$(pidof dconf-service)
 PID_DBUS=$(pidof dbus-daemon)
 
@@ -571,21 +572,20 @@ cinnamon)
             fi
             killall nautilus-desktop | tee -a $LOGFILE
         fi
-
-        # Prevent Nautilus from drawing the desktop
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
     fi
 
     if [ -e /usr/share/applications/org.gnome.Nautilus.desktop ];
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/org.gnome.Nautilus.desktop || true;
-
-        # Prevent Nautilus from drawing the desktop
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
     fi
+
+    # Prevent Gnome from drawing the desktop (for Xubuntu, Nautilus is not
+    #   installed but these settings were still true, thus not allowing nemo
+    #   to draw the desktop. So set to false all the time even if nautilus not
+    #   installed.
+    su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
+    su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
 
     if [ -e /usr/share/applications/nautilus-compare-preferences.desktop ];
     then
@@ -917,20 +917,12 @@ xfce)
             fi
             killall nautilus-desktop | tee -a $LOGFILE
         fi
-
-        # Prevent Nautilus from drawing the desktop
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
     fi
 
     if [ -e /usr/share/applications/org.gnome.Nautilus.desktop ];
     then
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/org.gnome.Nautilus.desktop || true;
-
-        # Prevent Nautilus from drawing the desktop
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
-        su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
     fi
 
     if [ -e /usr/share/applications/nautilus-compare-preferences.desktop ];
@@ -938,6 +930,13 @@ xfce)
         desktop-file-edit --set-key=NoDisplay --set-value=true \
             /usr/share/applications/nautilus-compare-preferences.desktop || true;
     fi
+
+    # Prevent Gnome from drawing the desktop (for Xubuntu, Nautilus is not
+    #   installed but these settings were still true, thus not allowing nemo
+    #   to draw the desktop. So set to false all the time even if nautilus not
+    #   installed.
+    su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background show-desktop-icons false' || true;
+    su "$CURR_USER" -c 'dbus-launch gsettings set org.gnome.desktop.background draw-background false' || true;
 
     # DISABLE notify-osd (xfce uses xfce4-notifyd)
     if [ -e /usr/share/dbus-1/services/org.freedesktop.Notifications.service ];

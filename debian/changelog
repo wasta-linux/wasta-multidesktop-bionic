@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.2.21) bionic; urgency=medium
+
+  * wasta-login.sh: if xfce active ensure gnome NOT drawing the desktop
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Sun, 17 Mar 2019 11:46:22 +0300
+
 wasta-multidesktop-bionic (1.2.20) bionic; urgency=medium
 
   * app-adjustments: sending xfce4-terminal warnings to /dev/null

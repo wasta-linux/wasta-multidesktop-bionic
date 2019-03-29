@@ -518,7 +518,7 @@ then
     # Per User Adjustments
     # --------------------------------------------------------------------------
     LOCAL_USERS=""
-    for USER_FOLDER in $(ls -1 home)
+    for USER_FOLDER in $(ls -1 /home)
     do
         # if user is in /etc/passwd then it is a 'real user' as opposed to
         # something like wasta-remastersys

@@ -492,28 +492,6 @@ fi
 # ------------------------------------------------------------------------------
 if [ -x /usr/bin/goldendict ];
 then
-    # for all users, correct http to https for wikipedia and wiktionary sources
-    #   (suppress errors if no user has initialized goldendict)
-    sed -i -e "s@http://\(.*\).wikipedia.org@https://\1.wikipedia.org@" \
-        /home/*/.goldendict/config >/dev/null 2>&1
-    sed -i -e "s@http://\(.*\).wiktionary.org@https://\1.wiktionary.org@" \
-        /home/*/.goldendict/config >/dev/null 2>&1
-
-    # for all users, correct hunspell dictionary path
-    #   (suppress errors if no user has initialized goldendict)
-    sed -i -e 's@\(hunspell dictionariesPath\).*@\1="/usr/share/hunspell"/>@' \
-        /home/*/.goldendict/config >/dev/null 2>&1
-
-    # fix comment
-    desktop-file-edit --set-comment="Dictionary / Thesaurus tool" \
-        /usr/share/applications/goldendict.desktop
-
-    # 18.04: goldendict (qt5) plus cinnamon plus app indicator will not show
-    # the tray icon.  Need to add dbus-launch to the launcher and then it will
-    # show.  See: https://github.com/linuxmint/Cinnamon/issues/6143
-    sed -i -e 's@^Exec=goldendict@Exec=dbus-launch goldendict@' \
-        /usr/share/applications/goldendict.desktop
-
     # --------------------------------------------------------------------------
     # Per User Adjustments
     # --------------------------------------------------------------------------
@@ -554,6 +532,28 @@ then
         -r 'config/paths/pathTMP' -v path \
         /home/$CURRENT_USER/.goldendict/config"
     done
+
+    # for all users, correct http to https for wikipedia and wiktionary sources
+    #   (suppress errors if no user has initialized goldendict)
+    sed -i -e "s@http://\(.*\).wikipedia.org@https://\1.wikipedia.org@" \
+        /home/*/.goldendict/config >/dev/null 2>&1
+    sed -i -e "s@http://\(.*\).wiktionary.org@https://\1.wiktionary.org@" \
+        /home/*/.goldendict/config >/dev/null 2>&1
+
+    # for all users, correct hunspell dictionary path
+    #   (suppress errors if no user has initialized goldendict)
+    sed -i -e 's@\(hunspell dictionariesPath\).*@\1="/usr/share/hunspell"/>@' \
+        /home/*/.goldendict/config >/dev/null 2>&1
+
+    # fix comment
+    desktop-file-edit --set-comment="Dictionary / Thesaurus tool" \
+        /usr/share/applications/goldendict.desktop
+
+    # 18.04: goldendict (qt5) plus cinnamon plus app indicator will not show
+    # the tray icon.  Need to add dbus-launch to the launcher and then it will
+    # show.  See: https://github.com/linuxmint/Cinnamon/issues/6143
+    sed -i -e 's@^Exec=goldendict@Exec=dbus-launch goldendict@' \
+        /usr/share/applications/goldendict.desktop
 fi
 
 # ------------------------------------------------------------------------------

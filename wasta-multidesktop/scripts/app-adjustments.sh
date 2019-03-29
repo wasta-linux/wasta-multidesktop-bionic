@@ -532,10 +532,11 @@ then
     do
         # ensure basic config file exists
         mkdir -p /home/$CURRENT_USER/.goldendict
-        if ! [ -e /home/$CURRENT_USER/.goldendict/config ];
+        if [ ! -f /home/$CURRENT_USER/.goldendict/config ];
         then
             # xmlstarlet needs a basic structure in order to be able to add path
-            echo "<config><paths></paths></config>" > $/home/$CURRENT_USER/.goldendict/config
+            echo "*** creating goldendict config file for $CURRENT_USER"
+            echo "<config><paths></paths></config>" > /home/$CURRENT_USER/.goldendict/config
         fi
 
         # ensure user file owned by user

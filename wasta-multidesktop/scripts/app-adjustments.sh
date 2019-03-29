@@ -520,7 +520,7 @@ then
         # ensure user file owned by user
         chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/.goldendict
 
-        # FIRST delete existing element
+        # wasta-resources: FIRST delete existing element
         # rik: can't get xmlstarlet to delete only the right path, so just using sed
         #xmlstarlet ed --inplace --delete 'config/paths/path[path="/usr/share/wasta-custom-ssg/resources/   goldendict"]'     /home/*/.goldendict/config
         su -l "$CURRENT_USER" -c "sed -i -e '\@usr/share/wasta-resources/.goldendict-dictionaries@d' /home/$CURRENT_USER/.goldendict/config"
@@ -528,7 +528,19 @@ then
         # create it with element name pathTMP, then can apply attr and then rename to path
         su -l "$CURRENT_USER" -c "xmlstarlet ed --inplace -s 'config/paths' -t elem -n 'pathTMP' \
         -v '/usr/share/wasta-resources/.goldendict-dictionaries' \
-        -s 'config/paths/pathTMP' -t attr -n 'recursive' -v '0' \
+        -s 'config/paths/pathTMP' -t attr -n 'recursive' -v '1' \
+        -r 'config/paths/pathTMP' -v path \
+        /home/$CURRENT_USER/.goldendict/config"
+
+        # goldendict-wordnet: FIRST delete existing element
+        # rik: can't get xmlstarlet to delete only the right path, so just using sed
+        #xmlstarlet ed --inplace --delete 'config/paths/path[path="/usr/share/wasta-custom-ssg/resources/   goldendict"]'     /home/*/.goldendict/config
+        su -l "$CURRENT_USER" -c "sed -i -e '\@usr/share/goldendict-wordnet@d' /home/$CURRENT_USER/.goldendict/config"
+
+        # create it with element name pathTMP, then can apply attr and then rename to path
+        su -l "$CURRENT_USER" -c "xmlstarlet ed --inplace -s 'config/paths' -t elem -n 'pathTMP' \
+        -v '/usr/share/goldendict-wordnet' \
+        -s 'config/paths/pathTMP' -t attr -n 'recursive' -v '1' \
         -r 'config/paths/pathTMP' -v path \
         /home/$CURRENT_USER/.goldendict/config"
     done

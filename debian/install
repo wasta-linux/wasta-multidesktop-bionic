@@ -1,3 +1,4 @@
+install-files/goldendict-dictionaries/*    usr/share/wasta-resources/.goldendict-dictionaries
 install-files/lightdm.conf.d               etc/lightdm
 install-files/plymouth-themes/*            usr/share/plymouth/themes
 install-files/schemas                      usr/share/glib-2.0

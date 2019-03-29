@@ -68,6 +68,7 @@
 #   - gnome-online-accounts: add to xfce settings (prefer cinnamon over gnome)
 # 2019-02-23 rik: cinnamon applet updates for cinnamon 4.0
 # 2019-03-16 rik: xfce4-terminal: only show in XFCE, hide preferences app
+# 2019-03-29 rik: add wasta-resources goldendict path for all users
 #
 # ==============================================================================
 
@@ -512,6 +513,46 @@ then
     # show.  See: https://github.com/linuxmint/Cinnamon/issues/6143
     sed -i -e 's@^Exec=goldendict@Exec=dbus-launch goldendict@' \
         /usr/share/applications/goldendict.desktop
+
+    # --------------------------------------------------------------------------
+    # Per User Adjustments
+    # --------------------------------------------------------------------------
+    LOCAL_USERS=""
+    for USER_FOLDER in $(ls -1 home)
+    do
+        # if user is in /etc/passwd then it is a 'real user' as opposed to
+        # something like wasta-remastersys
+        if [ "$(grep $USER_FOLDER /etc/passwd)" ];
+        then
+            LOCAL_USERS+="$USER_FOLDER "
+        fi
+    done
+
+    for CURRENT_USER in $LOCAL_USERS;
+    do
+        # ensure basic config file exists
+        mkdir -p /home/$CURRENT_USER/.goldendict
+        if ! [ -e /home/$CURRENT_USER/.goldendict/config ];
+        then
+            # xmlstarlet needs a basic structure in order to be able to add path
+            echo "<config><paths></paths></config>" > $/home/$CURRENT_USER/.goldendict/config
+        fi
+
+        # ensure user file owned by user
+        chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/.goldendict
+
+        # FIRST delete existing element
+        # rik: can't get xmlstarlet to delete only the right path, so just using sed
+        #xmlstarlet ed --inplace --delete 'config/paths/path[path="/usr/share/wasta-custom-ssg/resources/   goldendict"]'     /home/*/.goldendict/config
+        su -l "$CURRENT_USER" -c "sed -i -e '\@usr/share/wasta-resources/.goldendict-dictionaries@d' /home/$CURRENT_USER/.goldendict/config"
+
+        # create it with element name pathTMP, then can apply attr and then rename to path
+        su -l "$CURRENT_USER" -c "xmlstarlet ed --inplace -s 'config/paths' -t elem -n 'pathTMP' \
+        -v '/usr/share/wasta-resources/.goldendict-dictionaries' \
+        -s 'config/paths/pathTMP' -t attr -n 'recursive' -v '0' \
+        -r 'config/paths/pathTMP' -v path \
+        /home/$CURRENT_USER/.goldendict/config"
+    done
 fi
 
 # ------------------------------------------------------------------------------

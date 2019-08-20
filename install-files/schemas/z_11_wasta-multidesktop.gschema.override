@@ -13,6 +13,7 @@
 #   2018-02-28 rik: adjusting slick-greeter values
 #   2019-01-08 rik: adding Wasta customized Gnome settings (wasta-core gives
 #       default Ubuntu experience)
+#   2019-08-20 rik: setting gnome-terminal theme to 'dark'
 #
 # ==============================================================================
 
@@ -53,6 +54,9 @@ titlebar-font = 'Ubuntu Bold 11'
 
 [org.gnome.shell]
 favorite-apps = ['firefox.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'wasta-backup.desktop', 'wasta-resources.desktop']
+
+[org.gnome.Terminal.Legacy.Settings]
+theme-variant = 'dark'
 
 [x.dm.slick-greeter]
 background = ''

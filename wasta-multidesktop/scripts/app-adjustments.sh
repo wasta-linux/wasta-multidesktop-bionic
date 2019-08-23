@@ -346,11 +346,8 @@ then
         sed -i -e '\@ibus-setup@d' \
             /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
 
-        # ibus-setup: add (need first element to be system-config-printer since
-        # want ibus in the "STANDALONE_MODULES" section)
-        sed -i -e \
-    'N;s@\(Keywords for filter.*\)\n\(.*system-config-printer\)@\1\n    [_("IBus Keyboard Input Methods"),   "ibus-setup",                          "ibus-setup",         "hardware",       _("ibus, kmfl, keyman, keyboard, input, language")],\n\2@' \
-            /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
+        # ibus-setup: add in the "STANDALONE_MODULES" section)
+        sed -i -e 's@\(STANDALONE_MODULES \=.*\)@\1\n    [_("IBus Keyboards"),                "ibus-setup",                          "ibus-setup",         "hardware",       _("ibus, kmfl, keyman, keyboard, input, language")],@' /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
     fi
 
     # --------------------------------------------------------------------------
@@ -362,10 +359,8 @@ then
         sed -i -e '\@km-config@d' \
             /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
 
-        # km-config: add (need first element to be system-config-printer since
-        # want km-config in the "STANDALONE_MODULES" section)
-        sed -i -e \
-    'N;s@\(Keywords for filter.*\)\n\(.*system-config-printer\)@\1\n    [_("Keyman Keyboards"),              "km-config",                           "km-config",          "hardware",       _("keyman, keyboard, input, language")],\n\2@' \
+        # km-config: add in the "STANDALONE_MODULES" section)
+        sed -i -e 's@\(STANDALONE_MODULES \=.*\)@\1\n    [_("Keyman Keyboards"),              "km-config",                           "km-config",          "hardware",       _("keyman, keyboard, input, language")],@' \
             /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
     fi
 
@@ -774,6 +769,10 @@ then
         /usr/share/applications/ibus-setup.desktop
 
     desktop-file-edit --add-category=X-XFCE-HardwareSettings \
+        /usr/share/applications/ibus-setup.desktop
+
+    # rename to "IBus Keyboards" for clarity
+    desktop-file-edit --set-name="IBus Keyboards" \
         /usr/share/applications/ibus-setup.desktop
 fi
 

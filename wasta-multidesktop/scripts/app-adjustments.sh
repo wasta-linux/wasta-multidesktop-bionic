@@ -69,6 +69,9 @@
 # 2019-02-23 rik: cinnamon applet updates for cinnamon 4.0
 # 2019-03-16 rik: xfce4-terminal: only show in XFCE, hide preferences app
 # 2019-03-29 rik: add wasta-resources goldendict path for all users
+# 2019-08-23 rik: cinnamon system settings: rename ibus to "IBus Keyboards" and
+#   add "Keyman Keyboards"
+#   - replicate arc-themes adjustments to arc-solid themes
 #
 # ==============================================================================
 
@@ -195,6 +198,50 @@ fi
 #-GtkScrollbar-has-forward-stepper: 1;
 
 # ------------------------------------------------------------------------------
+# arc-solid theme
+# ------------------------------------------------------------------------------
+if [ -e /usr/share/themes/Arc-solid ];
+then
+    # scrollbars: "one page at a time" when clicking: GTK 2
+    # NOTE: GTK 3 setting in postinst since no risk of being overwritten
+    sed -i -e 's@\(gtk-primary-button-warps-slider\).*@\1 = 0@' \
+        /usr/share/themes/Arc-solid/gtk-2.0/gtkrc \
+        /usr/share/themes/Arc-Dark-solid/gtk-2.0/gtkrc \
+        /usr/share/themes/Arc-Darker-solid/gtk-2.0/gtkrc
+
+    # add whiskermenu compatibility (Arc-Darker and Arc-Dark only)
+    # first delete:
+    sed -i -e '\@gtk-whiskermenu-wasta@d' \
+        /usr/share/themes/Arc-Dark-solid/gtk-3.0/gtk.css \
+        /usr/share/themes/Arc-Darker-solid/gtk-3.0/gtk.css
+
+    # then add:
+    sed -i -e "$ a @import url(\"$DIR/resources/gtk-whiskermenu-wasta.css\");" \
+        /usr/share/themes/Arc-Dark-solid/gtk-3.0/gtk.css \
+        /usr/share/themes/Arc-Darker-solid/gtk-3.0/gtk.css
+
+    # make Arc-solid themes compatible with xfce4-windowck-plugin (not sure why
+    #   the .svg is not recognized by the code, but adding the .png solves it)
+    if ! [ -e "/usr/share/themes/Arc-solid/unity/close_focused_normal.png" ];
+    then
+        ln -s /usr/share/themes/Arc-solid/unity/close_focused_normal.svg \
+            /usr/share/themes/Arc-solid/unity/close_focused_normal.png
+    fi
+
+    if ! [ -e "/usr/share/themes/Arc-Dark-solid/unity/close_focused_normal.png" ];
+    then
+        ln -s /usr/share/themes/Arc-Dark-solid/unity/close_focused_normal.svg \
+            /usr/share/themes/Arc-Dark-solid/unity/close_focused_normal.png
+    fi
+
+    if ! [ -e "/usr/share/themes/Arc-Darker-solid/unity/close_focused_normal.png" ];
+    then
+        ln -s /usr/share/themes/Arc-Darker-solid/unity/close_focused_normal.svg \
+            /usr/share/themes/Arc-Darker-solid/unity/close_focused_normal.png
+    fi
+fi
+
+# ------------------------------------------------------------------------------
 # baobab
 # ------------------------------------------------------------------------------
 # Add to "Accessories" category (by removing from X-GNOME-Utilities)
@@ -295,14 +342,30 @@ then
     # --------------------------------------------------------------------------
     if [ -e /usr/share/applications/ibus-setup.desktop ];
     then
-        # ibus-setup: first remove: 
+        # ibus-setup: first remove:
         sed -i -e '\@ibus-setup@d' \
             /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
 
         # ibus-setup: add (need first element to be system-config-printer since
         # want ibus in the "STANDALONE_MODULES" section)
         sed -i -e \
-    'N;s@\(Keywords for filter.*\)\n\(.*system-config-printer\)@\1\n    [_("Keyboard Input Methods"),        "ibus-setup",                   "ibus-setup",         "hardware",       _("ibus, kmfl, keyman, keyboard, input, language")],\n\2@' \
+    'N;s@\(Keywords for filter.*\)\n\(.*system-config-printer\)@\1\n    [_("IBus Keyboard Input Methods"),   "ibus-setup",                          "ibus-setup",         "hardware",       _("ibus, kmfl, keyman, keyboard, input, language")],\n\2@' \
+            /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
+    fi
+
+    # --------------------------------------------------------------------------
+    # IF Keyman then add to Cinnamon Settings
+    # --------------------------------------------------------------------------
+    if [ -e /usr/share/applications/km-config.desktop ];
+    then
+        # km-config: first remove:
+        sed -i -e '\@km-config@d' \
+            /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
+
+        # km-config: add (need first element to be system-config-printer since
+        # want km-config in the "STANDALONE_MODULES" section)
+        sed -i -e \
+    'N;s@\(Keywords for filter.*\)\n\(.*system-config-printer\)@\1\n    [_("Keyman Keyboards"),              "km-config",                           "km-config",          "hardware",       _("keyman, keyboard, input, language")],\n\2@' \
             /usr/share/cinnamon/cinnamon-settings/cinnamon-settings.py
     fi
 

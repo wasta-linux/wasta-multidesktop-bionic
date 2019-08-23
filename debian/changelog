@@ -1,3 +1,10 @@
+wasta-multidesktop-bionic (1.3.3) bionic; urgency=medium
+
+  * app-adjustments.sh: apply arc-theme adjustments to arc-solid-theme
+    - add km-config to cinnamon-settings
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Fri, 23 Aug 2019 12:24:05 +0300
+
 wasta-multidesktop-bionic (1.3.2) bionic; urgency=medium
 
   * gschema-override: set gnome-terminal theme to 'dark'

@@ -9,7 +9,7 @@ Homepage: https://github.com/wasta-linux/wasta-multidesktop-bionic
 Package: wasta-multidesktop-bionic
 Architecture: all
 Depends: at, jq, rename, slick-greeter, wasta-core-bionic, wasta-resources, wmctrl, ${shlibs:Depends}, ${misc:Depends}
-Recommends: arc-theme, wasta-papirus, wasta-vertex-ubuntu
+Recommends: arc-solid-theme, arc-theme, wasta-papirus, wasta-vertex-ubuntu
 Conflicts: gdm3
 Description: Wasta-Linux MultiDesktop
  Ensures cross-desktop compatibility between different desktop sessions.

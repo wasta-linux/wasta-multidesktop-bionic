@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.4.0) bionic; urgency=medium
+
+  * 18.04.4 release: updated logos
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Mon, 02 Mar 2020 15:36:25 +0300
+
 wasta-multidesktop-bionic (1.3.4) bionic; urgency=medium
 
   * app-adjustments.sh: cleanup way ibus and keyman added to cinnamon-settings

@@ -1,3 +1,9 @@
+wasta-multidesktop-bionic (1.4.2) bionic; urgency=medium
+
+  * updated plymouth logos
+
+ -- Rik Shaw <rikshaw76@gmail.com>  Tue, 24 Mar 2020 20:27:24 +0300
+
 wasta-multidesktop-bionic (1.4.1) bionic; urgency=medium
 
   * convert logo text to path for better scalability

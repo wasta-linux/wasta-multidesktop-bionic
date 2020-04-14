@@ -1123,6 +1123,16 @@ then
 fi
 
 # ------------------------------------------------------------------------------
+# synaptic
+# ------------------------------------------------------------------------------
+if [ -e /usr/share/applications/synaptic.desktop ];
+then
+    # Add "Software" to name so found in search
+    desktop-file-edit --set-name="Synaptic Software Package Manager" \
+        /usr/share/applications/synaptic.desktop
+fi
+
+# ------------------------------------------------------------------------------
 # system-config-printer
 # ------------------------------------------------------------------------------
 # add to XFCE Settings Manager

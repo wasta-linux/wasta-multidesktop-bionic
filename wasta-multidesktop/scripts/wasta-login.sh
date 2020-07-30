@@ -73,6 +73,7 @@
 #       desktop icons
 #   2019-03-17 rik: add xubuntu to xfce session check
 #       - ensure gnome NOT drawing desktop even if Nautilus not installed
+#   2020-07-30 rik: adding 'wasta-gnome' session compatibility
 #
 # ==============================================================================
 
@@ -356,7 +357,7 @@ cinnamon)
     fi
 ;;
 
-ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
+ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz|wasta-gnome)
     # apply GNOME settings to other DEs
     if [ $DEBUG ];
     then
@@ -646,7 +647,7 @@ cinnamon)
 #    fi
 ;;
 
-ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz)
+ubuntu|ubuntu-xorg|gnome|gnome-flashback-metacity|gnome-flashback-compiz|wasta-gnome)
     # ==========================================================================
     # ACTIVE SESSION: UBUNTU / GNOME
     # ==========================================================================
